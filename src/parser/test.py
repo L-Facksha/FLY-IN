@@ -1,8 +1,56 @@
 import re
 
-data = "nb_drones: 255645646"
+data = "connection: gate_hell1-gate_hell2 [max_link_capacity=5]"
+# data = data.split(":")[1]
 
-nb = re.findall(r"-?\d+", data)
-if len(nb) != 1:
-    print("Invalid nb_drones format")
-print(nb)
+
+extract = re.search(r"(\w+)\-(\w+)", data)
+from_zone = extract.group(1)
+to_zone = extract.group(2)
+print(from_zone, to_zone)
+# extract = re.search(r"\[(.*?)\]", data)
+# check = extract.group(1).split("=")[0]
+try:
+    extract = re.search(r"\[(.*?)\]", data)
+    check = extract.group(1)
+    if not "max_link_capacity" in check:
+        raise
+except:
+    raise ValueError("Invalid format: usage [max_link_capacity=number]")
+
+capacity = int(extract.group(1).split("=")[1])
+link_capacity = {}
+link_capacity[(from_zone, to_zone)] = capacity
+print(link_capacity)
+# print(extract)
+# print(int(extract.group(1).split("=")[1]))
+
+
+# extract = re.search(r"\[(.*?)\]", data)
+
+
+# meta = extract.group(1).split(" ")
+
+# res = {}
+# for item in meta:
+#     key, val = item.split("=")
+#     res[key] = int(val) if val.isdigit() else val
+
+# print(res)
+
+
+# cords = re.search(r"(\w+)\s*(-?\d+)\s*(-?\d+)", data)
+# print(cords)
+# st = cords.group(1)
+# nb = cords.group(2)
+# d_nb = int(cords.group(2))
+# d_nbx = int(cords.group(3))
+# di: dict[str, tuple[int, int]] = {}
+# # if len(nb) != 1:
+# #     print("Invalid nb_drones format")
+# di[st] = (d_nb, d_nbx)
+# print(type(nb))
+# print(nb)
+# print(type(d_nb))
+# print(d_nb)
+# print(di)
