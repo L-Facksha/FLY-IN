@@ -39,79 +39,109 @@ class Parser():
             print(f"{error}")
 
     def parse_nb_drones(self, line):
-        nb = re.findall(r"\d+", line)
+        nb = re.findall(r"-?\d+", line)
+        if not nb:
+            raise ValueError("ERROR: nb_drones must be integer")
+        elif int(nb[0]) < 0:
+            raise ValueError("ERROR: nb_drones must be positive")
         if len(nb) != 1:
-            raise ValueError("Invalid nb_drones format")
+            raise ValueError("Invalid nb_drones format: 'nb_drones: number'")
+
         self.nb_drones = int(nb[0])
-    
+
     def parse_metadata(self, zone_name, line):
         extract = re.search(r"\[(.*?)\]", line)
-        metadata = extract.group().split(" ")
+        metadata = extract.group(1).split(" ")
         data = {}
 
         for item in metadata:
             key, val = item.split("=")
-            data[key] = val
+            data[key] = int(val) if val.isdigit() else val
 
         self.zone_metadata[zone_name] = data
 
-
     def parse_hubs(self, line):
-        s_exist = False
-        e_exist = False
+        if line.startswith("start_hub") and self.start_hub == "":
+            line = line.split(":")[1]
 
-        if self.start_hub in self.zone_coords:
-            s_exist = True
-        if self.end_hub in self.zone_coords:
-            e_exist = True
+            extract = re.search(r"(\w+)\s(-?\d+)\s(-?\d+)", line)
 
-        if line.startswith("start_hub") and not s_exist:
-            extract = re.search(r"(\w+)\s*(-?\d+)\s*(-?\d+)", line)
+            if not extract:
+                raise ValueError(
+                    f"ERROR: Invalid format:{line}")
+
             self.start_hub = extract.group(1)
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
 
             self.zone_coords[self.start_hub] = (self.x, self.y)
-            self.parse_metadata(self.start_hub, line)
+            if "=" in line:
+                self.parse_metadata(self.start_hub, line)
 
         elif line.startswith("hub"):
-            extract = re.search(r"(\w+)\s*(-?\d+)\s*(-?\d+)", line)
+            line = line.split(":")[1]
+            extract = re.search(r"(\w+)\s(-?\d+)\s(-?\d+)", line)
+            if not extract:
+                raise ValueError(
+                    f"ERROR: Invalid format:{line}")
             zone_name = extract.group(1)
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
 
+            if zone_name in self.zone_coords:
+                raise ValueError(f"WARNING: Duplicate hub <{zone_name}>")
+
             self.zone_coords[zone_name] = (self.x, self.y)
-            self.parse_metadata(zone_name, line)
+            if "=" in line:
+                self.parse_metadata(zone_name, line)
 
-
-        elif line.startswith("end_hub") and not e_exist:
-            extract = re.search(r"(\w+)\s*(-?\d+)\s*(-?\d+)", line)
+        elif line.startswith("end_hub") and self.end_hub == "":
+            line = line.split(":")[1]
+            extract = re.search(r"(\w+)\s(-?\d+)\s(-?\d+)", line)
+            if not extract:
+                raise ValueError(
+                    f"ERROR: Invalid format:{line}")
             self.end_hub = extract.group(1)
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
 
             self.zone_coords[self.end_hub] = (self.x, self.y)
-            self.parse_metadata(self.end_hub, line)
-        
+            if "=" in line:
+                self.parse_metadata(self.end_hub, line)
 
     def parse_connection(self, line):
         try:
-            extract = re.search(r"(\w+)\-(\w+)", line)
+            extract = re.search(r"(\w+)-(\w+)", line)
+            if not extract:
+                raise ValueError(f"Invalide connection format:{line}")
             from_zone = extract.group(1)
             to_zone = extract.group(2)
-            try:
-                extract = re.search(r"\[(.*?)\]")
+
+            if from_zone not in self.zone_coords:
+                raise ValueError(f"Unknown hub: {from_zone}")
+            if to_zone not in self.zone_coords:
+                raise ValueError(f"Unknown hub: {to_zone}")
+            if (from_zone, to_zone) in self.connection:
+                raise ValueError(f"Duplicate connection {from_zone}-{to_zone}")
+
+            self.connection.append((from_zone, to_zone))
+
+            extract = re.search(r"\[(.*?)\]", line)
+            if not extract:
                 check = extract.group(1)
-                if not "max_link_capacity" in check:
-                    raise
-            except:
-                raise ValueError("Invalid format: usage [max_link_capacity=number]")
-            
-            capacity = int(extract.group(1).split("=")[1])
-            self.link_capacity[(from_zone, to_zone)] = capacity
+                if not check.startswith("max_link_capacity="):
+                    raise ValueError(
+                        "Invalid format: usage [max_link_capacity=number]")
+
+                capacity = int(check.split("=")[1])
+
+                if capacity < 0:
+                    raise ValueError("max_link_capacity must be positive")
+                self.link_capacity[(from_zone, to_zone)] = capacity
 
         except Exception as error:
             print(f"ERROR: {error}")
+            return 1
 
     def parse_file(self):
         nb_drones = False
@@ -127,14 +157,36 @@ class Parser():
                     self.parse_nb_drones(line)
 
                 elif line.startswith("start_hub") or line.startswith("hub") or line.startswith("end_hub"):
-                    line = line.split(":")[1]
                     self.parse_hubs(line)
-                
+
                 elif line.startswith("connection"):
                     line = line.split(":")[1]
-                    self.parse_connection(line)
+                    print(line)
+                    res = self.parse_connection(line)
+                    if res == 1:
+                        sys.exit(1)
+
+            if self.start_hub == "" or self.end_hub == "":
+                raise ValueError(
+                    "ERORR: You missing <start_hub> or <end_hub> !!")
+
+            for key, val in self.zone_metadata.items():
+                if "zone" not in val:
+                    continue
+                self.zone_type[key] = val["zone"]
         except Exception as error:
             print(f"{error}")
+            return 1
 
-                
 
+sel = Parser()
+sel.load_file()
+sel.parse_file()
+# print(sel.nb_drones)
+# print(sel.start_hub)
+# print(sel.end_hub)
+# print(sel.zone_coords)
+# print(sel.zone_metadata)
+# print(sel.connection)
+print(sel.link_capacity)
+# print(sel.zone_type)

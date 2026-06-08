@@ -4,39 +4,39 @@ data = "connection: gate_hell1-gate_hell2 [max_link_capacity=5]"
 # data = data.split(":")[1]
 
 
-extract = re.search(r"(\w+)\-(\w+)", data)
-from_zone = extract.group(1)
-to_zone = extract.group(2)
-print(from_zone, to_zone)
-# extract = re.search(r"\[(.*?)\]", data)
-# check = extract.group(1).split("=")[0]
-try:
-    extract = re.search(r"\[(.*?)\]", data)
-    check = extract.group(1)
-    if not "max_link_capacity" in check:
-        raise
-except:
-    raise ValueError("Invalid format: usage [max_link_capacity=number]")
+# extract = re.search(r"(\w+)\-(\w+)", data)
+# from_zone = extract.group(1)
+# to_zone = extract.group(2)
+# print(from_zone, to_zone)
+# # extract = re.search(r"\[(.*?)\]", data)
+# # check = extract.group(1).split("=")[0]
+# try:
+#     extract = re.search(r"\[(.*?)\]", data)
+#     check = extract.group(1)
+#     if not "max_link_capacity" in check:
+#         raise
+# except:
+#     raise ValueError("Invalid format: usage [max_link_capacity=number]")
 
-capacity = int(extract.group(1).split("=")[1])
-link_capacity = {}
-link_capacity[(from_zone, to_zone)] = capacity
-print(link_capacity)
+# capacity = int(extract.group(1).split("=")[1])
+# link_capacity = {}
+# link_capacity[(from_zone, to_zone)] = capacity
+# print(link_capacity)
 # print(extract)
 # print(int(extract.group(1).split("=")[1]))
 
 
-# extract = re.search(r"\[(.*?)\]", data)
+extract = re.search(r"\[(.*?)\]", data)
 
 
-# meta = extract.group(1).split(" ")
+meta = extract.group().split(" ")
 
-# res = {}
-# for item in meta:
-#     key, val = item.split("=")
-#     res[key] = int(val) if val.isdigit() else val
+res = {}
+for item in meta:
+    key, val = item.split("=")
+    res[key] = int(val) if val.isdigit() else val
 
-# print(res)
+print(res)
 
 
 # cords = re.search(r"(\w+)\s*(-?\d+)\s*(-?\d+)", data)
