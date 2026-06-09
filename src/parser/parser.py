@@ -127,7 +127,7 @@ class Parser():
             self.connection.append((from_zone, to_zone))
 
             extract = re.search(r"\[(.*?)\]", line)
-            if not extract:
+            if extract:
                 check = extract.group(1)
                 if not check.startswith("max_link_capacity="):
                     raise ValueError(
@@ -135,7 +135,7 @@ class Parser():
 
                 capacity = int(check.split("=")[1])
 
-                if capacity < 0:
+                if capacity <= 0:
                     raise ValueError("max_link_capacity must be positive")
                 self.link_capacity[(from_zone, to_zone)] = capacity
 
