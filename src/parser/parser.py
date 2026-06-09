@@ -11,7 +11,7 @@ class Parser():
         self.nb_drones: int = 0
         self.start_hub: str = ""
         self.end_hub: str = ""
-        self.zone: list[str] = []
+        self.zones: list[str] = []
         self.zone_type: dict[str, str] = {}
         self.x: int = 0
         self.y: int = 0
@@ -37,12 +37,13 @@ class Parser():
 
         except Exception as error:
             print(f"{error}")
+            sys.exit(1)
 
     def parse_nb_drones(self, line, indx):
         nb = re.findall(r"-?\d+", line)
         if not nb:
             raise ValueError(f"ERROR: nb_drones must be integer, line {indx}")
-        elif int(nb[0]) < 0:
+        elif int(nb[0]) <= 0:
             raise ValueError(f"ERROR: nb_drones must be positive, line {indx}")
         if len(nb) != 1:
             raise ValueError(
@@ -115,6 +116,7 @@ class Parser():
                 )
 
             self.zone_coords[self.start_hub] = (self.x, self.y)
+            self.zones.append(self.start_hub)
             if "=" in line or "[" in line or "]" in line:
                 self.parse_metadata(self.start_hub, line, indx)
 
@@ -137,6 +139,7 @@ class Parser():
                     f"WARNING: Duplicate hub '{zone_name}', line {indx}")
 
             self.zone_coords[zone_name] = (self.x, self.y)
+            self.zones.append(zone_name)
             if "=" in line or "[" in line or "]" in line:
                 self.parse_metadata(zone_name, line, indx)
 
@@ -159,6 +162,7 @@ class Parser():
                 )
 
             self.zone_coords[self.end_hub] = (self.x, self.y)
+            self.zones.append(self.end_hub)
             if "=" in line or "[" in line or "]" in line:
                 self.parse_metadata(self.end_hub, line, indx)
 
@@ -175,7 +179,9 @@ class Parser():
                 raise ValueError(f"Unknown hub: {from_zone}, line {indx}")
             if to_zone not in self.zone_coords:
                 raise ValueError(f"Unknown hub: {to_zone}, line {indx}")
-            if (from_zone, to_zone) in self.connection:
+            if (from_zone, to_zone) in self.connection or \
+                    (to_zone, from_zone) in self.connection:
+
                 raise ValueError(
                     f"Duplicate connection {from_zone}-{to_zone}, line {indx}")
 
@@ -197,6 +203,7 @@ class Parser():
 
         except Exception as error:
             print(f"ERROR: {error}")
+            sys.exit(1)
 
     def parse_file(self):
         nb_drones = False
@@ -228,7 +235,7 @@ class Parser():
                 )
             if self.start_hub == "" or self.end_hub == "":
                 raise ValueError(
-                    "ERORR: You missing <start_hub> or <end_hub> !!")
+                    "ERORR: Missing 'start_hub' or 'end_hub' !!")
 
             if not self.connection:
                 raise ValueError(
@@ -252,5 +259,8 @@ sel.parse_file()
 # print(sel.zone_coords)
 # print(sel.zone_metadata)
 # print(sel.connection)
+print(sel.zones)
 # print(sel.link_capacity)
-print(sel.zone_type)
+# print(sel.zone_type)
+
+
