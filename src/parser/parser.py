@@ -258,9 +258,8 @@ sel.parse_file()
 # print(sel.end_hub)
 # print(sel.zone_coords)
 # print(sel.zone_metadata)
-# print(sel.connection)
+print(sel.connection)
+print("\n", "*"*197)
 print(sel.zones)
 # print(sel.link_capacity)
 # print(sel.zone_type)
-
-
