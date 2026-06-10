@@ -40,3 +40,18 @@ class Graph():
 
         self.zone_capacity = parser.zone_capacity.copy()
         self.link_capacity = parser.link_capacity.copy()
+
+    def get_neighbors(self, zone: str) -> list[str]:
+        return self.neighbors.get(zone, [])
+
+    def get_cost(self, from_zone: str, to_zone: str) -> int:
+        return self.costs.get((from_zone, to_zone), 1)
+
+    def get_zone_capacity(self, zone: str) -> int:
+        return self.zone_capacity.get(zone, 1)
+
+    def get_link_capacity(self, from_zone: str, to_zone: str) -> int:
+        return self.link_capacity.get(
+            (from_zone, to_zone),
+            self.link_capacity.get((to_zone, from_zone), 1)
+        )

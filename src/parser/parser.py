@@ -57,7 +57,8 @@ class Parser():
         extract = re.search(r"\[(.*?)\]", line)
         if not extract:
             raise ValueError(
-                f"Invalid metadata format, line {indx}\nMetadata mus be inside []"
+                f"Invalid metadata format, line {indx}\n\
+Metadata mus be inside []"
             )
         metadata = extract.group(1).split(" ")
         data = {}
@@ -76,17 +77,20 @@ class Parser():
             key, val = parts
             if key not in allowed:
                 raise ValueError(
-                    f"Unknown metadata key: '{key}', line {indx}\nvalid keys:{allowed}"
+                    f"Unknown metadata key: '{key}', line {indx}\n\
+valid keys:{allowed}"
                 )
             if key == "zone":
                 if val not in allowed_zone:
                     raise ValueError(
-                        f"Invalid value: '{val}', line {indx}\nvalid value:{allowed_zone}"
+                        f"Invalid value: '{val}', line {indx}\n\
+valid value:{allowed_zone}"
                     )
             if key == "max_drones":
                 if not val.isdigit() or int(val) <= 0:
                     raise ValueError(
-                        f"Metadata value must be positive number: '{key}={val}', line {indx}"
+                        f"Metadata value must be positive number: \
+'{key}={val}', line {indx}"
                     )
 
             data[key] = int(val) if val.isdigit() else val
@@ -191,7 +195,8 @@ class Parser():
                 check = extract.group(1)
                 if not check.startswith("max_link_capacity="):
                     raise ValueError(
-                        f"Invalid format: usage [max_link_capacity=number], line {indx}")
+                        f"Invalid format: \
+usage [max_link_capacity=number], line {indx}")
 
                 capacity = int(check.split("=")[1])
 
@@ -222,7 +227,8 @@ class Parser():
                     nb_drones = True
                     self.parse_nb_drones(line, indx)
 
-                elif line.startswith("start_hub") or line.startswith("hub") or line.startswith("end_hub"):
+                elif line.startswith("start_hub") or\
+                        line.startswith("hub") or line.startswith("end_hub"):
                     self.parse_hubs(line, indx)
 
                 elif line.startswith("connection"):
@@ -241,25 +247,28 @@ class Parser():
                 raise ValueError(
                     "Map must contain at less one connection"
                 )
-            for key, val in self.zone_metadata.items():
-                if "zone" not in val:
-                    self.zone_type[key] = "normal"
-                    continue
-                self.zone_type[key] = val["zone"]
+
+            for zone in self.zones:
+                meta = self.zone_metadata.get(zone, {})
+                self.zone_type[zone] = meta.get('zone', 'normal')
+                if zone not in self.zone_capacity:
+                    self.zone_capacity[zone] = meta.get('max_drones', 1)
+
         except Exception as error:
             print(f"{error}")
 
 
-sel = Parser()
-sel.load_file()
-sel.parse_file()
+# sel = Parser()
+# sel.load_file()
+# sel.parse_file()
 # print(sel.nb_drones)
 # print(sel.start_hub)
 # print(sel.end_hub)
 # print(sel.zone_coords)
 # print(sel.zone_metadata)
-print(sel.connection)
-print("\n", "*"*197)
-print(sel.zones)
+# print(sel.zone_capacity)
+# print(sel.connection)
+# print("\n", "*"*197)
+# print(sel.zones)
 # print(sel.link_capacity)
 # print(sel.zone_type)

@@ -1,6 +1,27 @@
-import re
+from parser import Parser
+from graph import Graph
 
-data = "connection: gate_hell1-gate_hell2 [max_link_capacity=5]"
+p = Parser()
+p.load_file()
+p.parse_file()
+g = Graph(p)
+g.build(p)
+
+
+print(g.get_neighbors("start"))                    # ['gate_hell1']
+print(g.get_cost("start", "gate_hell1"))           # 1
+print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
+print(g.get_zone_capacity("start"))                # 25
+print(g.get_link_capacity("start", "gate_hell1"))  # 1
+
+
+
+
+
+
+# import re
+
+# data = "connection: gate_hell1-gate_hell2 [max_link_capacity=5]"
 # data = data.split(":")[1]
 
 
@@ -26,17 +47,17 @@ data = "connection: gate_hell1-gate_hell2 [max_link_capacity=5]"
 # print(int(extract.group(1).split("=")[1]))
 
 
-extract = re.search(r"\[(.*?)\]", data)
+# extract = re.search(r"\[(.*?)\]", data)
 
 
-meta = extract.group().split(" ")
+# meta = extract.group().split(" ")
 
-res = {}
-for item in meta:
-    key, val = item.split("=")
-    res[key] = int(val) if val.isdigit() else val
+# res = {}
+# for item in meta:
+#     key, val = item.split("=")
+#     res[key] = int(val) if val.isdigit() else val
 
-print(res)
+# print(res)
 
 
 # cords = re.search(r"(\w+)\s*(-?\d+)\s*(-?\d+)", data)
