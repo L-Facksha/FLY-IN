@@ -16,9 +16,6 @@ print(g.get_link_capacity("start", "gate_hell1"))  # 1
 
 
 
-
-
-
 # import re
 
 # data = "connection: gate_hell1-gate_hell2 [max_link_capacity=5]"
