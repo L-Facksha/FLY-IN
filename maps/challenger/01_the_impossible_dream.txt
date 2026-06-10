@@ -70,7 +70,7 @@ hub: conv_restricted3 15 2 [zone=restricted color=darkred max_drones=1]
 
 hub: conv_restricted4 13 0 [zone=restricted color=darkred max_drones=1]
 hub: conv_restricted5 14 0 [zone=restricted color=darkred max_drones=1]
-hub: conv_restricted6 15 0 [zone=restricted color=darkred max_drones=1]
+hub: conv_restricted6 15 0 [zone=restrited color=darkred max_drones=1]
 
 hub: conv_restricted7 13 -2 [zone=restricted color=darkred max_drones=1]
 hub: conv_restricted8 14 -2 [zone=restricted color=darkred max_drones=1]
