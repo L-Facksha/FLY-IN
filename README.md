@@ -1,12 +1,12 @@
 # Fly-in — Drone Routing System
 
-*This project has been created as part of the 42 curriculum by \<your_login\>.*
+*This project has been created as part of the 42 curriculum by L-Facksha.*
 
 ---
 
 ## Algorithm Visualization
 
-[![Dijkstra Visualizer](https://img.shields.io/badge/▶%20Dijkstra-Interactive%20Visualizer-4f6ef7?style=for-the-badge)](https://<your-login>.github.io/<your-repo>/dijkstra.html)
+[![Dijkstra Visualizer](https://img.shields.io/badge/▶%20Dijkstra-Interactive%20Visualizer-4f6ef7?style=for-the-badge)](https://htmlpreview.github.io/?https://github.com/L-Facksha/FLY-IN/blob/main/dijkstra.html)
 
 > Click the badge above to open the interactive Dijkstra step-by-step visualizer.
 > It shows exactly how the algorithm picks nodes, updates distances, and finds the shortest path.
@@ -75,7 +75,7 @@ where g(n) = actual cost from start to node n
 
 **Interactive visualization:**
 
-[![Dijkstra Visualizer](https://img.shields.io/badge/▶%20Try%20it-Step%20through%20Dijkstra-4f6ef7?style=flat-square)](https://<your-login>.github.io/<your-repo>/dijkstra.html)
+[![Dijkstra Visualizer](https://img.shields.io/badge/▶%20Try%20it-Step%20through%20Dijkstra-4f6ef7?style=flat-square)](https://htmlpreview.github.io/?https://github.com/L-Facksha/FLY-IN/blob/main/dijkstra.html)
 
 ### Multi-Drone Scheduling
 
