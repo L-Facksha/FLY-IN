@@ -7,7 +7,7 @@ p.parse_file()
 g = Graph(p)
 g.build(p)
 
-
+print(g.neighbors)
 print(g.get_neighbors("start"))                    # ['gate_hell1']
 print(g.get_cost("start", "gate_hell1"))           # 1
 print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
