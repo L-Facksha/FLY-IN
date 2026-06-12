@@ -16,9 +16,10 @@ class Dijkstra:
 
         while True:
             current: str | None = None
-            for zone in dist:
+
+            for zone in self.graph.neighbors:
                 if zone not in visited:
-                    if current is None or dist[zone] < dist[current]:
+                    if zone is None or dist[zone] < dist[current]:
                         current = zone
 
             if current is None or current == end:
@@ -26,7 +27,7 @@ class Dijkstra:
 
             visited.add(current)
 
-            for neighbor in self.graph.get_neighbors(current):
+            for neighbor in self.graph.neighbors(current):
                 if neighbor in visited:
                     continue
                 new_cost = dist[current] + \
@@ -34,16 +35,3 @@ class Dijkstra:
                 if new_cost < dist[neighbor]:
                     dist[neighbor] = new_cost
                     prev[neighbor] = current
-
-        path: list[str] = []
-        current = end
-        while current in prev:
-            path.append(current)
-            current = prev[current]
-        path.append(start)
-        path.reverse()
-
-        if path[0] != start:
-            return []
-
-        return path
