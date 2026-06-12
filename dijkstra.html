@@ -1,491 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dijkstra Algorithm Visualizer</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 32px 16px;
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #f8fafc;
-      letter-spacing: -0.3px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #64748b;
-      margin-bottom: 32px;
-    }
-
-    .container {
-      display: flex;
-      gap: 24px;
-      max-width: 960px;
-      width: 100%;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .graph-panel {
-      background: #1e2330;
-      border-radius: 16px;
-      border: 1px solid #2d3348;
-      padding: 24px;
-      flex: 1;
-      min-width: 320px;
-      max-width: 500px;
-    }
-
-    .info-panel {
-      background: #1e2330;
-      border-radius: 16px;
-      border: 1px solid #2d3348;
-      padding: 24px;
-      flex: 1;
-      min-width: 280px;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .step-msg {
-      background: #151820;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 14px;
-      color: #94a3b8;
-      line-height: 1.6;
-      min-height: 60px;
-      border-left: 3px solid #4f6ef7;
-    }
-
-    .step-msg b { color: #f8fafc; }
-
-    .panel-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    th {
-      color: #475569;
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 6px 10px;
-      border-bottom: 1px solid #2d3348;
-      text-align: center;
-    }
-
-    td {
-      padding: 7px 10px;
-      border-bottom: 1px solid #1a1f2e;
-      text-align: center;
-      color: #94a3b8;
-      transition: background 0.2s;
-    }
-
-    tr:last-child td { border-bottom: none; }
-
-    .row-current td { background: rgba(239,159,39,0.08); }
-    .row-visited td { opacity: 0.4; }
-    .row-path td { background: rgba(232,93,36,0.08); }
-
-    .cell-highlight { color: #EF9F27 !important; font-weight: 600; }
-    .cell-updated   { color: #378ADD !important; font-weight: 600; }
-    .cell-path      { color: #E85D24 !important; font-weight: 600; }
-    .cell-name      { font-weight: 600; color: #e2e8f0; }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      flex: 1;
-      padding: 10px 0;
-      border-radius: 10px;
-      border: 1px solid #2d3348;
-      background: #151820;
-      color: #e2e8f0;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-      font-weight: 500;
-    }
-
-    button:hover:not(:disabled) {
-      background: #252a3a;
-      border-color: #4f6ef7;
-      color: #fff;
-    }
-
-    button:disabled {
-      opacity: 0.3;
-      cursor: default;
-    }
-
-    button.primary {
-      background: #4f6ef7;
-      border-color: #4f6ef7;
-      color: #fff;
-    }
-
-    button.primary:hover:not(:disabled) {
-      background: #3d5ce5;
-      border-color: #3d5ce5;
-    }
-
-    .legend {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .step-counter {
-      font-size: 12px;
-      color: #475569;
-      text-align: right;
-    }
-
-    .cost-note {
-      font-size: 12px;
-      color: #475569;
-      background: #151820;
-      border-radius: 8px;
-      padding: 10px 14px;
-      line-height: 1.7;
-    }
-
-    .cost-note span { color: #94a3b8; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dijkstra Visualizer — Fly-in</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;padding:20px 16px}
+h1{font-size:20px;font-weight:500;color:#f8fafc;margin-bottom:3px}
+.sub{font-size:12px;color:#475569;margin-bottom:20px}
+.wrap{display:flex;gap:16px;max-width:1020px;margin:0 auto;flex-wrap:wrap}
+.left{flex:1;min-width:320px}
+.right{flex:0 0 205px;display:flex;flex-direction:column;gap:10px}
+.panel{background:#1e2330;border-radius:12px;border:1px solid #2d3348;padding:13px}
+.ptitle{font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
+.svg-box{background:#1a1f2e;border-radius:12px;border:1px solid #2d3348;padding:12px}
+.hint{font-size:11px;color:#475569;margin-bottom:8px}
+.tbtn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:8px;border:1px solid #2d3348;background:#151820;color:#94a3b8;cursor:pointer;font-size:12px;margin-bottom:5px;text-align:left;transition:all .15s}
+.tbtn:hover{background:#1e2330;color:#e2e8f0}
+.tbtn.sel{border-width:2px}
+.zdot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.abtn{width:100%;padding:8px;border-radius:8px;border:1px solid #2d3348;background:#151820;color:#e2e8f0;cursor:pointer;font-size:12px;font-weight:500;margin-bottom:5px;transition:background .15s}
+.abtn:hover:not(:disabled){background:#252a3a}
+.abtn:disabled{opacity:.28;cursor:default}
+.abtn.run{background:#4f6ef7;border-color:#4f6ef7;color:#fff}
+.abtn.run:hover:not(:disabled){background:#3d5ce5}
+.info{background:#151820;border-left:3px solid #4f6ef7;border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:#94a3b8;line-height:1.7;min-height:50px}
+.info b{color:#f8fafc}
+.prog{height:3px;background:#1a1f2e;border-radius:2px;overflow:hidden;margin-top:3px}
+.pbar{height:100%;background:#4f6ef7;border-radius:2px;transition:width .2s}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{color:#475569;padding:5px 6px;border-bottom:1px solid #1a1f2e;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:.4px;font-weight:500}
+td{padding:4px 6px;border-bottom:1px solid #1a1f2e;text-align:center;color:#64748b}
+tr:last-child td{border-bottom:none}
+tr.cur td{color:#EF9F27;font-weight:600}
+tr.vis td{opacity:.3}
+tr.upd td{color:#60a5fa;font-weight:600}
+tr.pth td{color:#34d399;font-weight:600}
+tr.nbr td{color:#c084fc;font-weight:500}
+.lrow{display:flex;align-items:center;gap:7px;font-size:11px;color:#64748b;padding:3px 0}
+.ldot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.nb-box{background:#151820;border-radius:8px;padding:8px 10px;font-size:11px;color:#94a3b8;min-height:32px;border:1px solid #2d3348}
+.nb-box b{color:#c084fc}
+</style>
 </head>
 <body>
 
-  <h1>Dijkstra Algorithm</h1>
-  <p class="subtitle">Step-by-step shortest path from A to F</p>
+<div style="max-width:1020px;margin:0 auto">
+  <h1>Dijkstra Visualizer — Fly-in</h1>
+  <p class="sub">Click a node to change zone type &nbsp;·&nbsp; drag nodes to reposition &nbsp;·&nbsp; step through the algorithm one by one</p>
+</div>
 
-  <div class="container">
-
-    <div class="graph-panel">
-      <div class="panel-title" style="margin-bottom:12px">Graph</div>
-      <svg width="100%" viewBox="0 0 420 300" id="graph-svg"></svg>
-      <div class="cost-note" style="margin-top:16px">
-        <span>Node label</span> = zone name &nbsp;·&nbsp;
-        <span>Number inside</span> = current dist &nbsp;·&nbsp;
-        <span>Edge number</span> = move cost
-      </div>
+<div class="wrap">
+  <div class="left">
+    <div class="svg-box">
+      <div class="hint">Select zone type on the right, then click any node (except S and Z) to change it</div>
+      <svg width="100%" viewBox="0 0 480 350" id="svg" style="display:block;touch-action:none"></svg>
     </div>
-
-    <div class="info-panel">
-      <div>
-        <div class="panel-title">Current step</div>
-        <div class="step-msg" id="step-msg">Press <b>Next step</b> to start Dijkstra from <b>A</b> to <b>F</b>.</div>
-      </div>
-
-      <div>
-        <div class="panel-title">Distance table</div>
-        <table id="dist-table">
-          <thead>
-            <tr>
-              <th>Node</th>
-              <th>dist</th>
-              <th>prev</th>
-              <th>done</th>
-            </tr>
-          </thead>
-          <tbody id="dist-body"></tbody>
-        </table>
-      </div>
-
-      <div class="btn-row">
-        <button class="primary" id="btn-next" onclick="nextStep()">Next step →</button>
-        <button id="btn-reset" onclick="reset()">Reset</button>
-      </div>
-
-      <div>
-        <div class="panel-title" style="margin-bottom:8px">Legend</div>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Current</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>Visited</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#378ADD"></div>Updated</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#E85D24"></div>Shortest path</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#2d3348;border:1px solid #475569"></div>Unvisited</div>
-        </div>
-      </div>
-
-      <div class="step-counter" id="step-counter">Step 0 / 0</div>
-    </div>
-
   </div>
 
-  <script>
-    const nodes = {
-      A: {x: 60,  y: 150, label: 'A'},
-      B: {x: 160, y: 60,  label: 'B'},
-      C: {x: 160, y: 240, label: 'C'},
-      D: {x: 270, y: 60,  label: 'D'},
-      E: {x: 270, y: 240, label: 'E'},
-      F: {x: 370, y: 150, label: 'F'},
-    };
+  <div class="right">
+    <div class="panel">
+      <div class="ptitle">Paint zone</div>
+      <button class="tbtn sel" id="tb-normal"     onclick="setTool('normal')">    <div class="zdot" style="background:#B5D4F4;border:1.5px solid #378ADD"></div>normal (cost 1)</button>
+      <button class="tbtn"     id="tb-priority"   onclick="setTool('priority')">  <div class="zdot" style="background:#C0DD97;border:1.5px solid #639922"></div>priority (cost 1★)</button>
+      <button class="tbtn"     id="tb-restricted" onclick="setTool('restricted')"><div class="zdot" style="background:#FAC775;border:1.5px solid #BA7517"></div>restricted (cost 2)</button>
+      <button class="tbtn"     id="tb-blocked"    onclick="setTool('blocked')">   <div class="zdot" style="background:#3a3a3a;border:1.5px solid #666"></div>blocked (no entry)</button>
+    </div>
 
-    const edges = [
-      {from:'A', to:'B', w:2},
-      {from:'A', to:'C', w:4},
-      {from:'B', to:'C', w:1},
-      {from:'B', to:'D', w:3},
-      {from:'B', to:'E', w:8},
-      {from:'C', to:'E', w:2},
-      {from:'D', to:'F', w:1},
-      {from:'E', to:'F', w:3},
-    ];
+    <div class="panel">
+      <div class="ptitle">Controls</div>
+      <button class="abtn run" onclick="runDijkstra()">Run Dijkstra</button>
+      <button class="abtn" id="b-prev" onclick="prevStep()" disabled>Prev step</button>
+      <button class="abtn" id="b-next" onclick="nextStep()" disabled>Next step</button>
+      <button class="abtn" onclick="resetSteps()">Clear path</button>
+      <button class="abtn" onclick="resetAll()">Reset map</button>
+      <div style="font-size:11px;color:#475569;text-align:right;margin-top:3px" id="ctr"></div>
+      <div class="prog"><div class="pbar" id="pbar" style="width:0%"></div></div>
+    </div>
 
-    const INF = 9999;
-    let stepLog = [];
-    let stepIdx = 0;
+    <div class="info" id="msg">Paint zones then press <b>Run Dijkstra</b>. Use next/prev to walk through each step.</div>
 
-    function buildSteps() {
-      let dist  = {A:0, B:INF, C:INF, D:INF, E:INF, F:INF};
-      let prev  = {A:null, B:null, C:null, D:null, E:null, F:null};
-      let visited = new Set();
-      let nodeStates = {};
-      let edgeStates = {};
-      const allNodes = Object.keys(nodes);
-      for (const n of allNodes) nodeStates[n] = 'unvisited';
+    <div class="panel">
+      <div class="ptitle">Current neighbors</div>
+      <div class="nb-box" id="nb-box">—</div>
+    </div>
 
-      const snap = () => ({
-        dist: Object.assign({}, dist),
-        prev: Object.assign({}, prev),
-        visited: new Set(visited),
-        nodeStates: Object.assign({}, nodeStates),
-        edgeStates: Object.assign({}, edgeStates),
-      });
+    <div class="panel" style="overflow-x:auto">
+      <div class="ptitle">Distance table</div>
+      <table><thead><tr><th>Node</th><th>dist</th><th>prev</th><th>done</th></tr></thead>
+      <tbody id="tb"></tbody></table>
+    </div>
 
-      stepLog.push({...snap(), current: null, updated: [], pathEdges: [],
-        msg: 'Init: dist[A] = 0, all others = ∞. Start exploring.'});
+    <div class="panel">
+      <div class="ptitle">Legend</div>
+      <div class="lrow"><div class="ldot" style="background:#B5D4F4;border:1px solid #378ADD"></div>normal — cost 1</div>
+      <div class="lrow"><div class="ldot" style="background:#C0DD97;border:1px solid #639922"></div>priority — cost 1★</div>
+      <div class="lrow"><div class="ldot" style="background:#FAC775;border:1px solid #BA7517"></div>restricted — cost 2</div>
+      <div class="lrow"><div class="ldot" style="background:#3a3a3a;border:1px solid #666"></div>blocked — no entry</div>
+      <div class="lrow"><div class="ldot" style="background:#34d399;border:1px solid #1D9E75"></div>shortest path</div>
+      <div class="lrow"><div class="ldot" style="background:#EF9F2733;border:2px solid #EF9F27"></div>current node</div>
+      <div class="lrow"><div class="ldot" style="background:#60a5fa33;border:2px solid #60a5fa"></div>updated node</div>
+      <div class="lrow"><div class="ldot" style="background:#c084fc33;border:2px solid #c084fc"></div>neighbor node</div>
+    </div>
+  </div>
+</div>
 
-      for (let iter = 0; iter < allNodes.length; iter++) {
-        let u = null, minD = INF;
-        for (const n of allNodes) {
-          if (!visited.has(n) && dist[n] < minD) { minD = dist[n]; u = n; }
-        }
-        if (u === null) break;
+<script>
+const INF=999999, R=22;
 
-        nodeStates[u] = 'current';
-        stepLog.push({...snap(), current: u, updated: [], pathEdges: [],
-          msg: `Pick unvisited node with lowest dist: <b>${u}</b> (dist = ${dist[u] === INF ? '∞' : dist[u]})`});
+let nodes=[
+  {id:0, x:50,  y:175, type:'start',      label:'S'},
+  {id:1, x:150, y:75,  type:'normal',     label:'A'},
+  {id:2, x:150, y:175, type:'normal',     label:'B'},
+  {id:3, x:150, y:270, type:'normal',     label:'C'},
+  {id:4, x:255, y:75,  type:'priority',   label:'D'},
+  {id:5, x:255, y:175, type:'normal',     label:'E'},
+  {id:6, x:255, y:270, type:'restricted', label:'F'},
+  {id:7, x:360, y:75,  type:'normal',     label:'G'},
+  {id:8, x:360, y:175, type:'restricted', label:'H'},
+  {id:9, x:360, y:270, type:'blocked',    label:'I'},
+  {id:10,x:445, y:175, type:'goal',       label:'Z'},
+];
 
-        if (u === 'F') {
-          visited.add(u);
-          nodeStates[u] = 'visited';
-          break;
-        }
+const EDGES=[[0,1],[0,2],[0,3],[1,2],[1,4],[2,3],[2,5],[3,6],[4,7],[4,5],[5,6],[5,8],[6,9],[7,8],[7,10],[8,9],[8,10],[9,10]];
 
-        visited.add(u);
-        nodeStates[u] = 'visited';
+const ZS={
+  normal:    {fill:'#B5D4F433',stroke:'#378ADD',tc:'#93C5FD',cost:1},
+  priority:  {fill:'#C0DD9733',stroke:'#639922',tc:'#86EFAC',cost:1},
+  restricted:{fill:'#FAC77533',stroke:'#BA7517',tc:'#FCD34D',cost:2},
+  blocked:   {fill:'#2a2a2a',  stroke:'#555',   tc:'#6b7280',cost:INF},
+  start:     {fill:'#F4C0D133',stroke:'#D4537E',tc:'#FDA4AF',cost:0},
+  goal:      {fill:'#F4C0D133',stroke:'#D4537E',tc:'#FDA4AF',cost:1},
+};
 
-        const neighbors = edges
-          .filter(e => e.from === u || e.to === u)
-          .map(e => e.from === u ? {n: e.to, w: e.w, e} : {n: e.from, w: e.w, e});
+let tool='normal', steps=[], si=-1, drag=null, dox=0, doy=0, isDragging=false;
 
-        const updated = [];
-        for (const {n, w, e} of neighbors) {
-          if (visited.has(n)) continue;
-          const newD = dist[u] + w;
-          const key = `${e.from}-${e.to}`;
-          if (newD < dist[n]) {
-            dist[n] = newD;
-            prev[n] = u;
-            updated.push(n);
-            edgeStates[key] = 'updated';
-            nodeStates[n] = 'updated';
-          }
-        }
+function getAdj(){
+  const a={};
+  nodes.forEach(n=>a[n.id]=[]);
+  EDGES.forEach(([a1,b])=>{a[a1].push(b);a[b].push(a1);});
+  return a;
+}
 
-        const updMsg = updated.length
-          ? updated.map(n => `${n} = ${dist[n]}`).join(', ')
-          : 'no updates needed';
+function nodeCost(id){
+  const t=nodes[id].type;
+  if(t==='blocked') return INF;
+  if(t==='restricted') return 2;
+  return 1;
+}
 
-        stepLog.push({...snap(), current: u, updated, pathEdges: [],
-          msg: `Visit <b>${u}</b>: check neighbors → updated: ${updMsg}`});
+function draw(sd){
+  const svg=document.getElementById('svg');
+  const pe=sd?sd.pathEdges||[]:[];
+  const ns=sd?sd.nodeState||{}:{};
+  const dist=sd?sd.dist||{}:{};
+  const nbrs=sd?sd.neighbors||[]:[];
+  let h='';
 
-        for (const n of updated) {
-          if (nodeStates[n] !== 'visited') nodeStates[n] = 'unvisited';
-        }
+  for(const [a,b] of EDGES){
+    const na=nodes[a],nb=nodes[b];
+    const key=`${Math.min(a,b)}-${Math.max(a,b)}`;
+    const ip=pe.includes(key);
+    const isNbrEdge= (ns[a]==='cur' && nbrs.includes(b)) || (ns[b]==='cur' && nbrs.includes(a));
+    const cost=nodeCost(b);
+    const cStr=cost===INF?'':String(cost);
+    const edgeCol=ip?'#34d399':isNbrEdge?'#c084fc66':'#2d3348';
+    const edgeSW=ip?3:isNbrEdge?2:1.5;
+    h+=`<line x1="${na.x}" y1="${na.y}" x2="${nb.x}" y2="${nb.y}" stroke="${edgeCol}" stroke-width="${edgeSW}" stroke-linecap="round"/>`;
+    if(cStr){
+      const mx=(na.x+nb.x)/2,my=(na.y+nb.y)/2;
+      const dx=nb.x-na.x,dy=nb.y-na.y,len=Math.sqrt(dx*dx+dy*dy)||1;
+      const ox=-dy/len*12,oy=dx/len*12;
+      h+=`<text x="${mx+ox}" y="${my+oy}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#374151" font-family="-apple-system,sans-serif">${cStr}</text>`;
+    }
+  }
+
+  for(const n of nodes){
+    const z=ZS[n.type]||ZS.normal;
+    const st=ns[n.id]||'idle';
+    const isNbr=nbrs.includes(n.id);
+    let fill=z.fill,stroke=z.stroke,sw=1.5,tc=z.tc;
+
+    if(st==='path')     {fill='#34d39933';stroke='#34d399';sw=3;tc='#34d399';}
+    else if(st==='cur') {fill='#EF9F2722';stroke='#EF9F27';sw=3;tc='#FCD34D';}
+    else if(st==='vis') {fill=z.fill.slice(0,7)+'11';stroke=z.stroke+'44';tc=z.tc+'55';}
+    else if(st==='upd') {fill='#60a5fa22';stroke='#60a5fa';sw=2.5;tc='#93C5FD';}
+    else if(isNbr)      {fill='#c084fc22';stroke='#c084fc';sw=2.5;tc='#e9d5ff';}
+
+    if(st==='cur') h+=`<circle cx="${n.x}" cy="${n.y}" r="${R+8}" fill="none" stroke="#EF9F2733" stroke-width="6"/>`;
+    if(isNbr&&st!=='cur'&&st!=='vis') h+=`<circle cx="${n.x}" cy="${n.y}" r="${R+5}" fill="none" stroke="#c084fc33" stroke-width="4"/>`;
+
+    h+=`<circle cx="${n.x}" cy="${n.y}" r="${R}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" data-id="${n.id}" style="cursor:pointer"/>`;
+
+    if(n.type==='blocked'){
+      h+=`<line x1="${n.x-9}" y1="${n.y-9}" x2="${n.x+9}" y2="${n.y+9}" stroke="#6b7280" stroke-width="2" pointer-events="none"/>`;
+      h+=`<line x1="${n.x+9}" y1="${n.y-9}" x2="${n.x-9}" y2="${n.y+9}" stroke="#6b7280" stroke-width="2" pointer-events="none"/>`;
+    }
+
+    const d=dist[n.id]!==undefined?(dist[n.id]===INF?'∞':dist[n.id]):'';
+    const yMain=d?n.y-5:n.y;
+    h+=`<text x="${n.x}" y="${yMain}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="${tc}" font-family="-apple-system,sans-serif" pointer-events="none">${n.label}</text>`;
+    if(d) h+=`<text x="${n.x}" y="${n.y+10}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${tc}" font-family="-apple-system,sans-serif" pointer-events="none">${d}</text>`;
+    if(n.type==='priority') h+=`<text x="${n.x+R-3}" y="${n.y-R+5}" font-size="10" fill="#86EFAC" font-family="-apple-system,sans-serif" pointer-events="none">★</text>`;
+    if(n.type==='restricted') h+=`<text x="${n.x+R-1}" y="${n.y-R+6}" font-size="9" fill="#FCD34D" font-family="-apple-system,sans-serif" pointer-events="none">2t</text>`;
+  }
+
+  svg.innerHTML=h;
+  bindSVG();
+}
+
+function bindSVG(){
+  const svg=document.getElementById('svg');
+  svg.querySelectorAll('circle[data-id]').forEach(c=>{
+    const id=parseInt(c.getAttribute('data-id'));
+    c.addEventListener('pointerdown', e=>startDrag(e, id));
+  });
+}
+
+function startDrag(e, id){
+  isDragging=false;
+  drag=id;
+  const svg=document.getElementById('svg');
+  const rect=svg.getBoundingClientRect();
+  const sx=480/rect.width, sy=350/rect.height;
+  dox=(e.clientX-rect.left)*sx - nodes[id].x;
+  doy=(e.clientY-rect.top)*sy  - nodes[id].y;
+  e.preventDefault();
+  e.stopPropagation();
+
+  const mv=ev=>{
+    if(drag===null) return;
+    const dist2=Math.abs(ev.clientX-(rect.left+nodes[id].x*rect.width/480))+Math.abs(ev.clientY-(rect.top+nodes[id].y*rect.height/350));
+    if(dist2>4) isDragging=true;
+    const r2=svg.getBoundingClientRect();
+    nodes[drag].x=Math.max(R, Math.min(480-R, (ev.clientX-r2.left)*sx - dox));
+    nodes[drag].y=Math.max(R, Math.min(350-R, (ev.clientY-r2.top)*sy  - doy));
+    draw(steps[si]||null);
+  };
+
+  const up=ev=>{
+    const wasDrag=isDragging;
+    drag=null; isDragging=false;
+    document.removeEventListener('pointermove',mv);
+    document.removeEventListener('pointerup',up);
+    if(!wasDrag) clickNode(id);
+  };
+
+  document.addEventListener('pointermove',mv);
+  document.addEventListener('pointerup',up);
+}
+
+function clickNode(id){
+  const n=nodes[id];
+  if(n.type==='start'||n.type==='goal') return;
+  n.type=tool;
+  steps=[];si=-1;
+  document.getElementById('b-next').disabled=true;
+  document.getElementById('b-prev').disabled=true;
+  document.getElementById('pbar').style.width='0%';
+  document.getElementById('ctr').textContent='';
+  document.getElementById('msg').innerHTML='Zone changed. Press <b>Run Dijkstra</b>.';
+  document.getElementById('nb-box').innerHTML='—';
+  renderTable({});
+  draw(null);
+}
+
+function setTool(t){
+  tool=t;
+  const cols={normal:'#378ADD',priority:'#639922',restricted:'#BA7517',blocked:'#666'};
+  ['normal','priority','restricted','blocked'].forEach(tt=>{
+    const b=document.getElementById('tb-'+tt);
+    const sel=tt===t;
+    b.className='tbtn'+(sel?' sel':'');
+    b.style.borderColor=sel?cols[tt]:'#2d3348';
+    b.style.borderWidth=sel?'2px':'1px';
+    b.style.color=sel?cols[tt]:'#94a3b8';
+  });
+}
+
+function buildSteps(){
+  const adj=getAdj();
+  const dist={},prev={},visited=new Set();
+  nodes.forEach(n=>dist[n.id]=INF);
+  const sN=nodes.find(n=>n.type==='start');
+  const gN=nodes.find(n=>n.type==='goal');
+  dist[sN.id]=0;
+  steps=[];
+  const ns={};nodes.forEach(n=>ns[n.id]='idle');
+
+  const snap=(upd,pe,nbrs)=>({
+    dist:{...dist},prev:{...prev},visited:new Set(visited),
+    nodeState:{...ns},updated:[...(upd||[])],pathEdges:[...(pe||[])],neighbors:[...(nbrs||[])]
+  });
+
+  steps.push({...snap([],[],[]),msg:`<b>Init:</b> dist[${sN.label}] = 0, all others = ∞`,nbInfo:'No current node yet.'});
+
+  const allIds=nodes.map(n=>n.id);
+  for(let iter=0;iter<allIds.length;iter++){
+    let u=null;
+    for(const id of allIds){
+      if(!visited.has(id)&&dist[id]<INF){
+        if(u===null||dist[id]<dist[u]||(dist[id]===dist[id]&&nodes[id].type==='priority'&&nodes[u].type!=='priority')) u=id;
       }
-
-      // Trace shortest path
-      let path = [], cur = 'F';
-      while (cur) { path.unshift(cur); cur = prev[cur]; }
-      const pEdges = [];
-      for (let i = 0; i < path.length - 1; i++) {
-        const a = path[i], b = path[i+1];
-        const e = edges.find(e => (e.from===a&&e.to===b)||(e.from===b&&e.to===a));
-        if (e) pEdges.push(`${e.from}-${e.to}`);
-      }
-
-      const finalNS = Object.assign({}, nodeStates);
-      for (const n of path) finalNS[n] = 'path';
-
-      stepLog.push({
-        dist: Object.assign({}, dist),
-        prev: Object.assign({}, prev),
-        visited: new Set(Object.keys(nodes)),
-        nodeStates: finalNS,
-        edgeStates: Object.assign({}, edgeStates),
-        current: null, updated: [],
-        pathEdges: pEdges,
-        msg: `✅ Done! Shortest path <b>A → F = ${dist['F']} turns</b> &nbsp;·&nbsp; Route: ${path.join(' → ')}`
-      });
     }
+    if(u===null) break;
+    ns[u]='cur';
 
-    function nodeColor(state) {
-      return {current:'#EF9F27', visited:'#1D9E75', updated:'#378ADD', path:'#E85D24'}[state] || null;
+    const visNbrs=adj[u].filter(nb=>!visited.has(nb)&&nodeCost(nb)<INF);
+    const nbInfo=visNbrs.length
+      ? visNbrs.map(nb=>`<b style="color:#c084fc">${nodes[nb].label}</b>(cost ${nodeCost(nb)})`).join(', ')
+      : 'no reachable neighbors';
+
+    steps.push({...snap([],[],visNbrs),
+      msg:`<b>Pick</b> lowest unvisited: <b>${nodes[u].label}</b> (dist = ${dist[u]})`,
+      nbInfo:`Neighbors of <b style="color:#FCD34D">${nodes[u].label}</b>: ${nbInfo}`});
+
+    if(u===gN.id) break;
+    visited.add(u);ns[u]='vis';
+    const upd=[];
+    for(const nb of adj[u]){
+      if(visited.has(nb)) continue;
+      const cost=nodeCost(nb);
+      if(cost===INF) continue;
+      const nd=dist[u]+cost;
+      if(nd<dist[nb]){dist[nb]=nd;prev[nb]=u;upd.push(nb);if(ns[nb]!=='vis')ns[nb]='upd';}
     }
+    const ul=upd.length?upd.map(id=>`${nodes[id].label}=${dist[id]}`).join(', '):'no updates';
+    steps.push({...snap(upd,[],visNbrs),
+      msg:`<b>Visit ${nodes[u].label}:</b> check neighbors → updated: ${ul}`,
+      nbInfo:`Neighbors of <b style="color:#FCD34D">${nodes[u].label}</b>: ${nbInfo}`});
+    upd.forEach(id=>{if(ns[id]!=='vis')ns[id]='idle';});
+  }
 
-    function drawGraph(step) {
-      const svg = document.getElementById('graph-svg');
-      const ns = step.nodeStates;
-      const es = step.edgeStates || {};
-      const pe = step.pathEdges || [];
+  let path=[],cur=gN.id;
+  const pe=[];
+  while(cur!==undefined&&cur!==null){path.unshift(cur);cur=prev[cur];}
+  for(let i=0;i<path.length-1;i++) pe.push(`${Math.min(path[i],path[i+1])}-${Math.max(path[i],path[i+1])}`);
+  const fns={...ns};
+  if(path[0]===sN.id) path.forEach(id=>fns[id]='path');
+  const tc=dist[gN.id];
+  const pathStr=path.map(id=>nodes[id].label).join(' → ');
+  const msg=tc===INF
+    ?`<b>No path found!</b> ${gN.label} is unreachable — remove blocked zones.`
+    :`<b>Done!</b> S → Z = <b>${tc} turns</b> &nbsp;·&nbsp; ${pathStr}`;
+  steps.push({dist:{...dist},prev:{...prev},visited:new Set(allIds),nodeState:fns,updated:[],pathEdges:pe,neighbors:[],msg,nbInfo:'Algorithm complete.'});
+}
 
-      let html = `<defs>
-        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </marker>
-      </defs>`;
+function renderStep(){
+  const s=steps[si];
+  document.getElementById('msg').innerHTML=s.msg;
+  document.getElementById('nb-box').innerHTML=s.nbInfo||'—';
+  document.getElementById('b-prev').disabled=si<=0;
+  document.getElementById('b-next').disabled=si>=steps.length-1;
+  document.getElementById('ctr').textContent=`Step ${si+1} / ${steps.length}`;
+  document.getElementById('pbar').style.width=`${Math.round(((si+1)/steps.length)*100)}%`;
+  draw(s);renderTable(s);
+}
 
-      for (const e of edges) {
-        const a = nodes[e.from], b = nodes[e.to];
-        const key = `${e.from}-${e.to}`;
-        const isPath = pe.includes(key);
-        const isUpd  = es[key] === 'updated';
-        const stroke = isPath ? '#E85D24' : isUpd ? '#378ADD' : '#2d3348';
-        const sw     = isPath ? 3 : isUpd ? 2 : 1.5;
-        const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
-        const dx = b.x-a.x, dy = b.y-a.y;
-        const len = Math.sqrt(dx*dx+dy*dy);
-        const ox = -dy/len * 14, oy = dx/len * 14;
-        html += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${stroke}" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
-        html += `<text x="${mx+ox}" y="${my+oy}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#475569" font-family="-apple-system,sans-serif" font-weight="600">${e.w}</text>`;
-      }
+function runDijkstra(){buildSteps();si=0;renderStep();}
+function nextStep(){if(si<steps.length-1){si++;renderStep();}}
+function prevStep(){if(si>0){si--;renderStep();}}
 
-      for (const [id, n] of Object.entries(nodes)) {
-        const state = ns[id] || 'unvisited';
-        const col   = nodeColor(state);
-        const fill  = col ? col + '22' : '#151820';
-        const stroke= col || '#2d3348';
-        const sw    = col ? 2.5 : 1.5;
-        const d     = step.dist[id];
-        const dStr  = d === INF ? '∞' : String(d);
-        const tcol  = col || '#94a3b8';
-        const isGoal = id === 'F', isStart = id === 'A';
+function renderTable(s){
+  document.getElementById('tb').innerHTML=nodes.map(n=>{
+    const st=s.nodeState?s.nodeState[n.id]||'idle':'idle';
+    const d=s.dist?s.dist[n.id]:undefined;
+    const dStr=d===undefined?'—':d===INF?'∞':String(d);
+    const p=s.prev&&s.prev[n.id]!==undefined?nodes[s.prev[n.id]].label:'—';
+    const vis=s.visited?s.visited.has(n.id):false;
+    const upd=(s.updated||[]).includes(n.id);
+    const isNbr=(s.neighbors||[]).includes(n.id);
+    const cls=st==='cur'?'cur':st==='vis'?'vis':upd?'upd':st==='path'?'pth':isNbr?'nbr':'';
+    return `<tr class="${cls}"><td>${n.label}</td><td>${dStr}</td><td>${p}</td><td>${vis?'✓':''}</td></tr>`;
+  }).join('');
+}
 
-        html += `<circle cx="${n.x}" cy="${n.y}" r="26" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-        if (isStart || isGoal) {
-          html += `<circle cx="${n.x}" cy="${n.y}" r="30" fill="none" stroke="${stroke}" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.5"/>`;
-        }
-        html += `<text x="${n.x}" y="${n.y-5}" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="700" fill="${tcol}" font-family="-apple-system,sans-serif">${id}</text>`;
-        html += `<text x="${n.x}" y="${n.y+10}" text-anchor="middle" dominant-baseline="central" font-size="11" fill="${col || '#475569'}" font-family="-apple-system,sans-serif">${dStr}</text>`;
-      }
+function resetSteps(){
+  steps=[];si=-1;
+  document.getElementById('b-next').disabled=true;
+  document.getElementById('b-prev').disabled=true;
+  document.getElementById('pbar').style.width='0%';
+  document.getElementById('ctr').textContent='';
+  document.getElementById('msg').innerHTML='Path cleared. Press <b>Run Dijkstra</b>.';
+  document.getElementById('nb-box').innerHTML='—';
+  renderTable({});draw(null);
+}
 
-      // Labels for start/goal
-      html += `<text x="60" y="195" text-anchor="middle" font-size="11" fill="#1D9E75" font-family="-apple-system,sans-serif" font-weight="600">start</text>`;
-      html += `<text x="370" y="195" text-anchor="middle" font-size="11" fill="#E85D24" font-family="-apple-system,sans-serif" font-weight="600">goal</text>`;
+function resetAll(){
+  nodes=[
+    {id:0, x:50,  y:175, type:'start',      label:'S'},
+    {id:1, x:150, y:75,  type:'normal',     label:'A'},
+    {id:2, x:150, y:175, type:'normal',     label:'B'},
+    {id:3, x:150, y:270, type:'normal',     label:'C'},
+    {id:4, x:255, y:75,  type:'priority',   label:'D'},
+    {id:5, x:255, y:175, type:'normal',     label:'E'},
+    {id:6, x:255, y:270, type:'restricted', label:'F'},
+    {id:7, x:360, y:75,  type:'normal',     label:'G'},
+    {id:8, x:360, y:175, type:'restricted', label:'H'},
+    {id:9, x:360, y:270, type:'blocked',    label:'I'},
+    {id:10,x:445, y:175, type:'goal',       label:'Z'},
+  ];
+  resetSteps();
+}
 
-      svg.innerHTML = html;
-    }
-
-    function renderTable(step) {
-      const tbody = document.getElementById('dist-body');
-      const allNodes = Object.keys(nodes);
-      tbody.innerHTML = allNodes.map(n => {
-        const state    = step.nodeStates[n] || 'unvisited';
-        const isCur    = step.current === n;
-        const isUpd    = step.updated && step.updated.includes(n);
-        const isVis    = step.visited.has(n);
-        const isPath   = state === 'path';
-        const d        = step.dist[n] === INF ? '∞' : step.dist[n];
-        const p        = step.prev[n] || '—';
-        const rowCls   = isPath ? 'row-path' : isCur ? 'row-current' : isVis ? 'row-visited' : '';
-        const dCls     = isCur ? 'cell-highlight' : isUpd ? 'cell-updated' : isPath ? 'cell-path' : '';
-        const nameCls  = 'cell-name' + (isCur ? ' cell-highlight' : isPath ? ' cell-path' : '');
-        return `<tr class="${rowCls}">
-          <td class="${nameCls}">${n}</td>
-          <td class="${dCls}">${d}</td>
-          <td>${p}</td>
-          <td>${isVis ? '✓' : ''}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    function nextStep() {
-      if (stepIdx < stepLog.length - 1) {
-        stepIdx++;
-        render();
-        if (stepIdx === stepLog.length - 1) {
-          document.getElementById('btn-next').disabled = true;
-        }
-      }
-    }
-
-    function reset() {
-      stepIdx = 0;
-      document.getElementById('btn-next').disabled = false;
-      render();
-    }
-
-    function render() {
-      const s = stepLog[stepIdx];
-      document.getElementById('step-msg').innerHTML = s.msg;
-      document.getElementById('step-counter').textContent = `Step ${stepIdx} / ${stepLog.length - 1}`;
-      drawGraph(s);
-      renderTable(s);
-    }
-
-    buildSteps();
-    render();
-  </script>
-
+draw(null);renderTable({});
+</script>
 </body>
 </html>
