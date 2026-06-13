@@ -1,11 +1,13 @@
 from parser import Parser
 from graph import Graph
+from algorithm import Dijkstra
 
 p = Parser()
 p.load_file()
 p.parse_file()
 g = Graph(p)
 g.build(p)
+d = Dijkstra(g)
 
 print(g.neighbors)
 print(g.get_neighbors("start"))                    # ['gate_hell1']
@@ -13,7 +15,9 @@ print(g.get_cost("start", "gate_hell1"))           # 1
 print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
 print(g.get_zone_capacity("start"))                # 25
 print(g.get_link_capacity("start", "gate_hell1"))  # 1
-
+path = d.run(g.start, g.end)
+print(path)
+print("Cost:", sum(g.get_cost(path[i], path[i+1]) for i in range(len(path)-1)))
 
 
 # import re

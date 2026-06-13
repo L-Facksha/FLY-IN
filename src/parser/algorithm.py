@@ -19,9 +19,16 @@ class Dijkstra:
             current: str | None = None
 
             for zone in self.graph.neighbors:
-                if zone not in visited:
-                    if current is None or dist[zone] < dist[current]:
+                if zone not in visited and dist[zone] < 9999:
+                    if current is None:
                         current = zone
+                    elif dist[zone] < dist[current]:
+                        current = zone
+                    elif dist[zone] == dist[current]:
+                        if self.graph.zone_type.get(zone) == 'priority' and\
+                            self.graph.zone_type.get(current) != \
+                                'priority':
+                            current = zone
 
             if current is None or current == end:
                 break
@@ -39,7 +46,7 @@ class Dijkstra:
 
         if start != end and end not in prev:
             return []
-        path = []
+        path: list[str] = []
         current = end
         while current in prev:
             path.append(current)

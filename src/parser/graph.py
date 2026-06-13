@@ -9,6 +9,7 @@ class Graph():
         self.costs: dict[tuple[str, str], int] = {}
         self.zone_capacity: dict[str, int] = {}
         self.link_capacity: dict[tuple[str, str], int] = {}
+        self.zone_type: dict[str, str] = parser.zone_type.copy()
 
     def build(self, parser: Parser):
         zone_costs = {
