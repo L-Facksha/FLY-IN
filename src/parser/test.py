@@ -1,6 +1,7 @@
 from parser import Parser
 from graph import Graph
 from algorithm import Dijkstra
+from traffic import Traffic
 
 p = Parser()
 p.load_file()
@@ -8,8 +9,10 @@ p.parse_file()
 g = Graph(p)
 g.build(p)
 d = Dijkstra(g)
-
-print(g.neighbors)
+t = Traffic(g, d, p.nb_drones)
+# print(g.neighbors)
+print(t.construction_paths())
+print(t.can_move(p.nb_drones))
 print(g.get_neighbors("start"))                    # ['gate_hell1']
 print(g.get_cost("start", "gate_hell1"))           # 1
 print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
