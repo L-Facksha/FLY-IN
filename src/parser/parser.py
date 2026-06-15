@@ -253,6 +253,8 @@ usage [max_link_capacity=number], line {indx}")
                 self.zone_type[zone] = meta.get('zone', 'normal')
                 if zone not in self.zone_capacity:
                     self.zone_capacity[zone] = meta.get('max_drones', 1)
+            self.zone_capacity[self.start_hub] = self.nb_drones
+            self.zone_capacity[self.end_hub] = self.nb_drones
 
         except Exception as error:
             print(f"{error}")

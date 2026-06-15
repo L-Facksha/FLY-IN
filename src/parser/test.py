@@ -2,25 +2,53 @@ from parser import Parser
 from graph import Graph
 from algorithm import Dijkstra
 from traffic import Traffic
+import sys
+
+# sys.argv = ["test.py", "maps/easy/02_simple_fork.txt"]
 
 p = Parser()
 p.load_file()
 p.parse_file()
+
 g = Graph(p)
 g.build(p)
+
 d = Dijkstra(g)
 t = Traffic(g, d, p.nb_drones)
-# print(g.neighbors)
-print(t.construction_paths())
-print(t.can_move(p.nb_drones))
-print(g.get_neighbors("start"))                    # ['gate_hell1']
-print(g.get_cost("start", "gate_hell1"))           # 1
-print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
-print(g.get_zone_capacity("start"))                # 25
-print(g.get_link_capacity("start", "gate_hell1"))  # 1
-path = d.run(g.start, g.end)
-print(path)
-print("Cost:", sum(g.get_cost(path[i], path[i+1]) for i in range(len(path)-1)))
+t.construction_paths()
+
+# test one turn at a time
+print("=== Turn 1 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 2 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 3 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 4 ===")
+moves = t.plan_turn()   # ← actually call it
+print(moves)
+
+print("=== drone positions ===")
+print(t.drone_zone)
+
+print("=== drone steps ===")
+print(t.drone_step)
+print("zone_count:", t.zone_count)
+print("drone_zone:", t.drone_zone)
+# print(g.get_neighbors("start"))                    # ['gate_hell1']
+# print(g.get_cost("start", "gate_hell1"))           # 1
+# print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
+# print(g.get_zone_capacity("start"))                # 25
+# print(g.get_link_capacity("start", "gate_hell1"))  # 1
+# path = d.run(g.start, g.end)
+# print(path)
+# print("Cost:", sum(g.get_cost(path[i], path[i+1]) for i in range(len(path)-1)))
 
 
 # import re
