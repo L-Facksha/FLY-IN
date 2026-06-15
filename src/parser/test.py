@@ -34,13 +34,215 @@ print("=== Turn 4 ===")
 moves = t.plan_turn()   # ← actually call it
 print(moves)
 
-print("=== drone positions ===")
-print(t.drone_zone)
+print("=== Turn 5 ===")
+moves = t.plan_turn()
+print(moves)
 
-print("=== drone steps ===")
-print(t.drone_step)
-print("zone_count:", t.zone_count)
-print("drone_zone:", t.drone_zone)
+print("=== Turn 6 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 7 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 8 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 9 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 10 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 11 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 12 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 13 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 14 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 15 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 16 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 17 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 18 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 19 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 20 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 21 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 22 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 23 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 24 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 25 ===")
+moves = t.plan_turn()
+print(moves)
+
+print("=== Turn 26 ===")
+moves = t.plan_turn()
+print(moves)
+
+# print("=== Turn 27 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 28 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 29 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 30 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 31 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 32 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 33 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 34 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 35 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 36 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 37 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 38 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 39 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 40 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 41 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 42 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 43 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 44 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 45 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 46 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 47 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 48 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 49 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 50 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 51 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 52 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 53 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 54 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 55 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 56 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 57 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 58 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 59 ===")
+# moves = t.plan_turn()
+
+# print("=== Turn 60 ===")
+# moves = t.plan_turn()
+
+
+print(moves)
+
+# print("=== drone positions ===")
+# print(t.drone_zone)
+
+# print("=== drone steps ===")
+# print(t.drone_step)
+# print("zone_count:", t.zone_count)
+# print("drone_zone:", t.drone_zone)
+
+# t = Traffic(g, d, p.nb_drones)
+# turns = t.run()
+
+# for i, turn in enumerate(turns, 1):
+#     print(f"Turn {i}: {' '.join(turn)}")
+
+# print(f"\nTotal turns: {len(turns)}")
+####################################################
 # print(g.get_neighbors("start"))                    # ['gate_hell1']
 # print(g.get_cost("start", "gate_hell1"))           # 1
 # print(g.get_cost("gate_hell3", "maze_loop1"))      # 2 (restricted)
