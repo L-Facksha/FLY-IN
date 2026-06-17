@@ -100,7 +100,6 @@ class Traffic():
                     break
 
                 moves = self.plan_turn()
-                print("moves:", moves)
                 if moves:
                     turns.append(moves)
                 else:

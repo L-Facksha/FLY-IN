@@ -10,6 +10,7 @@ class Graph():
         self.zone_capacity: dict[str, int] = {}
         self.link_capacity: dict[tuple[str, str], int] = {}
         self.zone_type: dict[str, str] = parser.zone_type.copy()
+        self.zone_color: dict[str, str] = {}
 
     def build(self, parser: Parser):
         zone_costs = {
@@ -38,6 +39,9 @@ class Graph():
                     if zone in self.neighbors[other]:
                         self.neighbors[other].remove(zone)
                 self.neighbors[zone] = []
+
+            meta = parser.zone_metadata.get(zone, {})
+            self.zone_color[zone] = meta.get('color', '')
 
         self.zone_capacity = parser.zone_capacity.copy()
         self.link_capacity = parser.link_capacity.copy()

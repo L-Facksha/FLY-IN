@@ -260,9 +260,9 @@ usage [max_link_capacity=number], line {indx}")
             print(f"{error}")
 
 
-# sel = Parser()
-# sel.load_file()
-# sel.parse_file()
+sel = Parser()
+sel.load_file()
+sel.parse_file()
 # print(sel.nb_drones)
 # print(sel.start_hub)
 # print(sel.end_hub)

@@ -1,3 +1,4 @@
+from simulator import Simulator
 from parser import Parser
 
 
@@ -51,173 +52,173 @@ g.build(p)
 
 d = Dijkstra(g)
 t = Traffic(g, d, p.nb_drones)
-try:
-    t.construction_paths()
+# try:
+#     t.construction_paths()
 
-    # test one turn at a time
-    print("=== Turn 1 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     # test one turn at a time
+#     print("=== Turn 1 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 2 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 2 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 3 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 3 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 4 ===")
-    moves = t.plan_turn()   # ← actually call it
-    print(moves)
+#     print("=== Turn 4 ===")
+#     moves = t.plan_turn()   # ← actually call it
+#     print(moves)
 
-    print("=== Turn 5 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 5 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 6 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 6 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 7 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 7 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 8 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 8 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 9 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 9 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 10 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 10 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 11 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 11 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 12 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 12 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 13 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 13 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 14 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 14 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 15 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 15 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 16 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 16 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 17 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 17 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 18 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 18 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 19 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 19 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 20 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 20 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 21 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 21 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 22 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 22 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 23 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 23 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 24 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 24 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 25 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 25 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 26 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 26 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 27 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 27 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 28 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 28 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 29 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 29 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 30 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 30 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 31 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 31 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 32 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 32 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 33 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 33 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 34 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 34 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 35 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 35 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 36 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 36 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 37 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 37 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 38 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 38 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 39 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 39 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 40 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 40 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
-    print("=== Turn 41 ===")
-    moves = t.plan_turn()
-    print(moves)
+#     print("=== Turn 41 ===")
+#     moves = t.plan_turn()
+#     print(moves)
 
     # print("=== Turn 42 ===")
     # moves = t.plan_turn()
@@ -275,8 +276,8 @@ try:
 
     # print("=== Turn 60 ===")
     # moves = t.plan_turn()
-except Exception as error:
-    print(error)
+# except Exception as error:
+#     print(error)
 # print("=== drone positions ===")
 # print(t.drone_zone)
 
@@ -288,10 +289,15 @@ except Exception as error:
 # t = Traffic(g, d, p.nb_drones)
 turns = t.run()
 
-for i, turn in enumerate(turns, 1):
-    print(f"Turn {i}: {' '.join(turn)}")
+# for i, turn in enumerate(turns, 1):
+#     print(f"Turn {i}: {' '.join(turn)}")
 
-print(f"\nTotal turns: {len(turns)}")
+# print(f"\nTotal turns: {len(turns)}")
+# print(turns)
+s = Simulator(g, t)
+
+ll = s.print_turns()
+# print(ll)
 ####################################################
 # print(g.get_neighbors("start"))                    # ['gate_hell1']
 # print(g.get_cost("start", "gate_hell1"))           # 1
