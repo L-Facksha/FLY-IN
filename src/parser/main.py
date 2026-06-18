@@ -3,7 +3,7 @@ from traffic import Traffic
 from graph import Graph
 from algorithm import Dijkstra
 from simulator import Simulator
-from viz import Visualizer
+# from viz import Visualizer
 
 p = Parser()
 p.load_file()
@@ -15,10 +15,10 @@ g.build(p)
 d = Dijkstra(g)
 
 t = Traffic(g, d, p.nb_drones)
-# t.run()
-turns = t.run()
+t.run()
+# turns = t.run()
 
 s = Simulator(g, t)
 s.print_turns()
-viz = Visualizer(g, turns)
-viz.run()
+# viz = Visualizer(g, turns)
+# viz.run()
