@@ -287,7 +287,7 @@ t = Traffic(g, d, p.nb_drones)
 # print("drone_zone:", t.drone_zone)
 
 # t = Traffic(g, d, p.nb_drones)
-turns = t.run()
+t.run()
 
 # for i, turn in enumerate(turns, 1):
 #     print(f"Turn {i}: {' '.join(turn)}")
@@ -296,7 +296,7 @@ turns = t.run()
 # print(turns)
 s = Simulator(g, t)
 
-ll = s.print_turns()
+s.print_turns()
 # print(ll)
 ####################################################
 # print(g.get_neighbors("start"))                    # ['gate_hell1']

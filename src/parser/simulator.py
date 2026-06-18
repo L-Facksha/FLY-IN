@@ -21,7 +21,6 @@ color_map: dict[str, str] = {
 }
 
 
-
 class Simulator():
     def __init__(self, graph: Graph, traffic: Traffic) -> None:
         self.graph = graph
@@ -40,8 +39,14 @@ class Simulator():
 
     def print_turns(self) -> None:
         turns = self.traffic.run()
+        start_zone = self.colorize_zone(self.graph.start)
+        initial = ' '.join(
+            f"D{d}-{start_zone}"
+            for d in range(1, self.traffic.nb_drones + 1)
+        )
+        print(initial)
         for turn in turns:
             colored = [self.colorize_move(mv) for mv in turn]
             print(' '.join(colored))
-        
+
         print(f"\nTotal turns: {len(turns)}")

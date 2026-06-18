@@ -6,7 +6,8 @@ RESET = "\033[0m"
 
 
 class Traffic():
-    def __init__(self, graph: Graph, dijkstra: Dijkstra, nb_drones: int) -> None:
+    def __init__(self, graph: Graph, dijkstra: Dijkstra, nb_drones: int)\
+            -> None:
         self.graph = graph
         self.dijkstra = dijkstra
         self.nb_drones = nb_drones
@@ -85,6 +86,7 @@ class Traffic():
             # print("llallaa", current_zone)
             # print("link_used:", link_used)
             # print("link_use:", link_used)
+            # print(moves)
 
         return moves
 
