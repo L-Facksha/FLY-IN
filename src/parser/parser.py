@@ -92,6 +92,10 @@ valid value:{allowed_zone}"
 '{key}={val}', line {indx}"
                     )
 
+            if key in data:
+                raise ValueError(
+                    f"ERROR: Duplicate metadata key: '{key}', line {indx}")
+
             data[key] = int(val) if val.isdigit() else val
 
         self.zone_metadata[zone_name] = data
@@ -102,16 +106,13 @@ valid value:{allowed_zone}"
                 raise ValueError(
                     "Multiple start_hub declarations"
                 )
-            # line = line.split(":")[1]
-            print(line)
 
             extract = re.fullmatch(
-                r"start_hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)", line)
-            print(extract.group(1))
+                r"start_hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)\s+(\[(.*?)\])?", line)
 
             if not extract:
                 raise ValueError(
-                    f"ERROR: Invalid format:{line}, line {indx}")
+                    f"ERROR: Invalid format: '{line}', line {indx}")
 
             self.start_hub = extract.group(1)
             self.x = int(extract.group(2))
@@ -127,11 +128,13 @@ valid value:{allowed_zone}"
                 self.parse_metadata(self.start_hub, line, indx)
 
         elif line.startswith("hub"):
-            line = line.split(":")[1]
-            extract = re.search(r"(\w+)\s(-?\d+)\s(-?\d+)", line)
+            extract = re.fullmatch(
+                r"hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)\s*(\[(.*?)\])?", line)
+
             if not extract:
                 raise ValueError(
-                    f"ERROR: Invalid format:{line}, line {indx}")
+                    f"ERROR: Invalid format: '{line}', line {indx}")
+
             zone_name = extract.group(1)
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
@@ -146,6 +149,7 @@ valid value:{allowed_zone}"
 
             self.zone_coords[zone_name] = (self.x, self.y)
             self.zones.append(zone_name)
+
             if "=" in line or "[" in line or "]" in line:
                 self.parse_metadata(zone_name, line, indx)
 
@@ -154,8 +158,8 @@ valid value:{allowed_zone}"
                 raise ValueError(
                     f"Multiple end_hub declarations, line {indx}"
                 )
-            line = line.split(":")[1]
-            extract = re.search(r"(\w+)\s(-?\d+)\s(-?\d+)", line)
+            extract = re.fullmatch(
+                r"end_hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)\s*(\[(.*?)\])?", line)
             if not extract:
                 raise ValueError(
                     f"ERROR: Invalid format:{line}, line {indx}")
@@ -169,17 +173,20 @@ valid value:{allowed_zone}"
 
             self.zone_coords[self.end_hub] = (self.x, self.y)
             self.zones.append(self.end_hub)
-            if "=" in line or "[" in line or "]" in line:
+            if re.search(r"\[.*\]", line):
                 self.parse_metadata(self.end_hub, line, indx)
 
     def parse_connection(self, line, indx):
         try:
-            extract = re.search(r"(\w+)-(\w+)", line)
+            extract = re.fullmatch(
+                r"connection:\s*(\w+)-(\w+)\s*(\[(.*?)\])?", line)
             if not extract:
                 raise ValueError(
                     f"Invalide connection format:{line}, line {indx}")
+
             from_zone = extract.group(1)
             to_zone = extract.group(2)
+            metadata = extract.group(4)
 
             if from_zone not in self.zone_coords:
                 raise ValueError(f"Unknown hub: {from_zone}, line {indx}")
@@ -191,16 +198,21 @@ valid value:{allowed_zone}"
                 raise ValueError(
                     f"Duplicate connection {from_zone}-{to_zone}, line {indx}")
 
-            self.connection.append((from_zone, to_zone))
-            extract = re.search(r"\[(.*?)\]", line)
-            if extract:
-                check = extract.group(1)
-                if not check.startswith("max_link_capacity="):
-                    raise ValueError(
-                        f"Invalid format: \
-usage [max_link_capacity=number], line {indx}")
+            if from_zone == to_zone:
+                raise ValueError(
+                    f"ERROR: Connection not alowed '{from_zone}', line {indx}")
 
-                capacity = int(check.split("=")[1])
+            self.connection.append((from_zone, to_zone))
+
+            if metadata:
+                check = re.fullmatch(r"max_link_capacity=(-?\d+)", metadata)
+                if not check:
+                    raise ValueError(
+                        f"Invalid format: Usage [max_link_capacity=number],\
+                            line {indx}"
+                    )
+
+                capacity = int(check.group(1))
 
                 if capacity <= 0:
                     raise ValueError(
@@ -235,15 +247,17 @@ usage [max_link_capacity=number], line {indx}")
 
                     self.parse_nb_drones(filter_line, indx)
 
-                elif first_word == "start_hub" or\
-                        first_word == "hub" or first_word == "end_hub":
-                    filter_line = line.split('#', 1)[0].strip()
-                    # print(filter_line)
-                    self.parse_hubs(filter_line, indx)
-
                 elif first_word == "connection":
-                    line = line.split(":")[1]
-                    self.parse_connection(line, indx)
+                    filter_line = line.split('#', 1)[0].strip()
+                    self.parse_connection(filter_line, indx)
+
+                elif first_word not in ('start_hub', 'hub', 'end_hub'):
+                    raise ValueError(
+                        f"ERROR: Invalid format: '{first_word}', line {indx} ")
+
+                elif first_word in ('start_hub', 'hub', 'end_hub'):
+                    filter_line = line.split('#', 1)[0].strip()
+                    self.parse_hubs(filter_line, indx)
 
             if not nb_drones:
                 raise ValueError(
