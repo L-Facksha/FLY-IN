@@ -40,16 +40,15 @@ class Parser():
             sys.exit(1)
 
     def parse_nb_drones(self, line, indx):
-        nb = re.findall(r"-?\d+", line)
+        nb = re.fullmatch(r"nb_drones:\s+(-?\d+)", line)
         if not nb:
-            raise ValueError(f"ERROR: nb_drones must be integer, line {indx}")
-        elif int(nb[0]) <= 0:
-            raise ValueError(f"ERROR: nb_drones must be positive, line {indx}")
-        if len(nb) != 1:
             raise ValueError(
-                f"Invalid nb_drones format: 'nb_drones: number', line {indx}")
+                f"ERROR LINE {indx}: Invalid format nb_drones '{line}'")
 
-        self.nb_drones = int(nb[0])
+        self.nb_drones = int(nb.group(1))
+
+        if self.nb_drones <= 0:
+            raise ValueError(f"ERROR: nb_drones must be positive, line {indx}")
 
     def parse_metadata(self, zone_name, line, indx):
         allowed = ['zone', 'color', 'max_drones']
@@ -103,9 +102,12 @@ valid value:{allowed_zone}"
                 raise ValueError(
                     "Multiple start_hub declarations"
                 )
-            line = line.split(":")[1]
+            # line = line.split(":")[1]
+            print(line)
 
-            extract = re.search(r"(\w+)\s(-?\d+)\s(-?\d+)", line)
+            extract = re.fullmatch(
+                r"start_hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)", line)
+            print(extract.group(1))
 
             if not extract:
                 raise ValueError(
@@ -216,22 +218,30 @@ usage [max_link_capacity=number], line {indx}")
             lines = self.map.splitlines()
             for indx, line in enumerate(lines, 1):
                 line = line.strip()
+
+                first_word = line.split(':')[0].strip()
+
                 if line.startswith("#") or line == "":
                     continue
 
-                elif line.startswith("nb_drones"):
+                elif first_word == "nb_drones":
                     if nb_drones:
                         raise ValueError(
                             "Multiple nb_drones declaration"
                         )
+
+                    filter_line = line.split('#', 1)[0].strip()
                     nb_drones = True
-                    self.parse_nb_drones(line, indx)
 
-                elif line.startswith("start_hub") or\
-                        line.startswith("hub") or line.startswith("end_hub"):
-                    self.parse_hubs(line, indx)
+                    self.parse_nb_drones(filter_line, indx)
 
-                elif line.startswith("connection"):
+                elif first_word == "start_hub" or\
+                        first_word == "hub" or first_word == "end_hub":
+                    filter_line = line.split('#', 1)[0].strip()
+                    # print(filter_line)
+                    self.parse_hubs(filter_line, indx)
+
+                elif first_word == "connection":
                     line = line.split(":")[1]
                     self.parse_connection(line, indx)
 
@@ -260,9 +270,9 @@ usage [max_link_capacity=number], line {indx}")
             print(f"{error}")
 
 
-# sel = Parser()
-# sel.load_file()
-# sel.parse_file()
+sel = Parser()
+sel.load_file()
+sel.parse_file()
 # print(sel.nb_drones)
 # print(sel.start_hub)
 # print(sel.end_hub)
