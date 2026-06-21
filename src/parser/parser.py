@@ -50,16 +50,38 @@ class Parser():
         if self.nb_drones <= 0:
             raise ValueError(f"ERROR: nb_drones must be positive, line {indx}")
 
+    def check_names(self, s: str) -> bool:
+        stack = []
+        pairs = {
+            "(": ")",
+            "[": "]",
+            "{": "}",
+            "<": ">"
+        }
+
+        closing = set(pairs.values())
+
+        for c in s:
+            if c in pairs:
+                stack.append(c)
+            elif c in closing:
+                if not stack or pairs[stack.pop()] != c:
+                    return False
+
+        return len(stack) == 0
+
     def parse_metadata(self, zone_name, line, indx):
         allowed = ['zone', 'color', 'max_drones']
         allowed_zone = ['priority', 'restricted', 'normal', 'blocked']
-        extract = re.search(r"\[(.*?)\]", line)
+        extract = re.findall(r"\[(.*?)\]", line)[-1]
+
         if not extract:
             raise ValueError(
                 f"Invalid metadata format, line {indx}\n\
 Metadata mus be inside []"
             )
-        metadata = extract.group(1).split(" ")
+        metadata = extract.split(" ")
+
         data = {}
 
         for item in metadata:
@@ -108,13 +130,22 @@ valid value:{allowed_zone}"
                 )
 
             extract = re.fullmatch(
-                r"start_hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)\s+(\[(.*?)\])?", line)
+                r"start_hub:\s*([^\s-]+)\s+(-?\d+)\s+(-?\d+)\s+(\[(.*?)\])?",
+                line
+            )
 
             if not extract:
                 raise ValueError(
                     f"ERROR: Invalid format: '{line}', line {indx}")
 
             self.start_hub = extract.group(1)
+
+            if not self.check_names(self.start_hub):
+                raise ValueError(
+                    f"Invalid format: {self.start_hub}, line {indx}")
+
+            self.start_hub = re.search(r"\w+", self.start_hub).group(0)
+
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
             if (self.x, self.y) in self.zone_coords.values():
@@ -129,13 +160,18 @@ valid value:{allowed_zone}"
 
         elif line.startswith("hub"):
             extract = re.fullmatch(
-                r"hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)\s*(\[(.*?)\])?", line)
+                r"hub:\s*([^\s-]+)\s+(-?\d+)\s+(-?\d+)\s*(\[(.*?)\])?", line)
 
             if not extract:
                 raise ValueError(
                     f"ERROR: Invalid format: '{line}', line {indx}")
 
             zone_name = extract.group(1)
+            if not self.check_names(zone_name):
+                raise ValueError(f"Invalid format: {zone_name}, line {indx}")
+
+            zone_name = re.search(r"\w+", zone_name).group(0)
+
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
             if (self.x, self.y) in self.zone_coords.values():
@@ -159,11 +195,30 @@ valid value:{allowed_zone}"
                     f"Multiple end_hub declarations, line {indx}"
                 )
             extract = re.fullmatch(
-                r"end_hub:\s*(\w+)\s+(-?\d+)\s+(-?\d+)\s*(\[(.*?)\])?", line)
+                r"end_hub:\s*([^\s-]+)\s+(-?\d+)\s+(-?\d+)\s*(\[(.*?)\])?",
+                line
+            )
+
             if not extract:
                 raise ValueError(
                     f"ERROR: Invalid format:{line}, line {indx}")
+
             self.end_hub = extract.group(1)
+            if not self.check_names(self.end_hub):
+                raise ValueError(
+                    f"Invalid format: {self.end_hub}, line {indx}")
+
+            self.end_hub = re.search(r"\w+", self.end_hub).group(0)
+
+            if not self.check_names(self.end_hub):
+                raise ValueError(
+                    f"Invalid format: {self.end_hub}, line {indx}")
+
+            self.end_hub = re.search(r"\w+", self.end_hub).group(0)
+
+            if self.end_hub.startswith('[') and self.end_hub.endswith(']'):
+                self.end_hub = self.end_hub[1:-1]
+
             self.x = int(extract.group(2))
             self.y = int(extract.group(3))
             if (self.x, self.y) in self.zone_coords.values():
@@ -284,9 +339,9 @@ valid value:{allowed_zone}"
             print(f"{error}")
 
 
-sel = Parser()
-sel.load_file()
-sel.parse_file()
+# sel = Parser()
+# sel.load_file()
+# sel.parse_file()
 # print(sel.nb_drones)
 # print(sel.start_hub)
 # print(sel.end_hub)
