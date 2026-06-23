@@ -48,6 +48,10 @@ class Traffic():
         # ── Step 1: arrive drones that were mid-link last turn ────────
         transit_done: list[int] = []
         for drone_id, (conn, to_zone) in self.in_transit.items():
+            zone_cap = self.graph.get_zone_capacity(to_zone)
+            if self.zone_count[to_zone] >= zone_cap:
+                continue
+
             self.zone_count[to_zone] += 1
             self.drone_zone[drone_id] = to_zone
             self.drone_step[drone_id] += 1
@@ -107,12 +111,15 @@ class Traffic():
                 turn_link[(current_zone, next_zone)] = \
                     turn_link.get((current_zone, next_zone), 0) + 1
                 confirmed.append((drone_id, current_zone, next_zone))
+                # self.zone_count[next_zone] += 1
+                # self.zone_count[current_zone] -= 1
                 moves.append(f"D{drone_id}-{next_zone}")
 
         for drone_id, current_zone, next_zone in confirmed:
             self.zone_count[current_zone] -= 1
-            self.zone_count[next_zone] += 1
+            # self.zone_count[next_zone] += 1
             self.turn_leving[next_zone] += 1
+            self.turn_leving[current_zone] -= 1
             self.drone_zone[drone_id] = next_zone
             self.drone_step[drone_id] += 1
 

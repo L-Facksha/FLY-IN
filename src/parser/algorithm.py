@@ -54,7 +54,7 @@ class Dijkstra:
 
         def score(p: list[str]) -> tuple[int, int]:
             pri = sum(1 for z in p
-                    if self.graph.zone_type.get(z) == 'priority')
+                      if self.graph.zone_type.get(z) == 'priority')
             return (-pri, len(p))
 
         all_paths.sort(key=score)
