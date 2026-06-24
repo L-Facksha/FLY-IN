@@ -64,6 +64,7 @@ class Traffic():
             del self.in_transit[drone_id]
 
         # ── Step 2: move drones not in transit ────────────────────────
+        restricted_turn = 2
         for drone_id in range(1, self.nb_drones + 1):
             if drone_id in self.in_transit:
                 continue
@@ -92,6 +93,11 @@ class Traffic():
                 continue
 
             if zone_type == 'restricted':
+                zone_cap = self.graph.get_zone_capacity(next_zone)
+                zone_used = self.zone_count.get(next_zone, 0)
+                if link_used >= zone_cap or zone_used >= zone_cap:
+                    continue
+
                 conn = f"{current_zone}-{next_zone}"
                 self.zone_count[current_zone] -= 1
                 self.drone_zone[drone_id] = conn
