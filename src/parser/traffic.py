@@ -106,11 +106,13 @@ class Traffic():
                 free_next_turn = (
                     zone_cap
                     - self.zone_count.get(next_zone, 0)
-                    + leaving.get(next_zone, 0)
+                    - leaving.get(next_zone, 0)
                     - entering_next.get(next_zone, 0)
                 )
                 if free_next_turn <= 0:
                     continue  # no guaranteed slot → drone stays, does NOT enter link
+                if link_used >= zone_cap:
+                    continue
 
                 conn = f"{current_zone}-{next_zone}"
                 entering_next[next_zone] = entering_next.get(next_zone, 0) + 1
@@ -121,7 +123,7 @@ class Traffic():
                 self.zone_count[current_zone] -= 1
                 self.drone_zone[drone_id] = conn
                 self.in_transit[drone_id] = (conn, next_zone)
-                # self.drone_step[drone_id] += 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                # self.drone_step[drone_id] += 1#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 moves.append(f"D{drone_id}-{conn}")
 
             else:
@@ -135,6 +137,7 @@ class Traffic():
                 if zone_used >= zone_cap:
                     continue
 
+                self.zone_count[current_zone] -= 1
                 leaving[current_zone] = leaving.get(current_zone, 0) + 1
                 turn_link[(current_zone, next_zone)] = (
                     turn_link.get((current_zone, next_zone), 0) + 1
