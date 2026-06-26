@@ -17,7 +17,7 @@ class Traffic():
         self.drone_zone: dict[int, str] = {}
         self.drone_step: dict[int, int] = {}
         self.zone_count: dict[str, int] = {}
-        self.turn_leving: dict[str, int] = {}
+        # self.turn_leving: dict[str, int] = {}
         # drone_id → (connection_name, destination_zone)
         self.in_transit: dict[int, tuple[str, str]] = {}
 
@@ -36,7 +36,7 @@ class Traffic():
 
         for zone in self.graph.neighbors:
             self.zone_count[zone] = 0
-            self.turn_leving[zone] = 0
+            # self.turn_leving[zone] = 0
         self.zone_count[self.graph.start] = self.nb_drones
 
     def plan_turn(self) -> list[str]:
@@ -103,13 +103,14 @@ class Traffic():
                 #   + leaving[next_zone]           (will leave next_zone this turn)
                 #   - entering_next[next_zone]     (already committed to arrive next turn)
                 zone_cap = self.graph.get_zone_capacity(next_zone)
-                free_next_turn = (
-                    zone_cap
-                    - self.zone_count.get(next_zone, 0)
+
+                future_occupancy = (
+                    self.zone_count.get(next_zone, 0)
                     - leaving.get(next_zone, 0)
-                    - entering_next.get(next_zone, 0)
+                    + entering_next.get(next_zone, 0)
                 )
-                if free_next_turn <= 0:
+
+                if future_occupancy >= zone_cap:
                     continue  # no guaranteed slot → drone stays, does NOT enter link
                 if link_used >= zone_cap:
                     continue
@@ -130,27 +131,28 @@ class Traffic():
                 # Normal / priority: arrives this same turn.
                 # Effective occupancy = count - drones leaving it + drones entering it
                 zone_cap = self.graph.get_zone_capacity(next_zone)
-                zone_used = (
+                future_occupancy = (
                     self.zone_count.get(next_zone, 0)
-                    - self.turn_leving.get(next_zone, 0)
+                    - leaving.get(next_zone, 0)
+                    + entering_next.get(next_zone, 0)
                 )
-                if zone_used >= zone_cap:
+
+                if future_occupancy >= zone_cap:
                     continue
 
-                self.zone_count[current_zone] -= 1
+                # self.zone_count[current_zone] -= 1
                 leaving[current_zone] = leaving.get(current_zone, 0) + 1
                 turn_link[(current_zone, next_zone)] = (
                     turn_link.get((current_zone, next_zone), 0) + 1
                 )
                 confirmed.append((drone_id, current_zone, next_zone))
+                entering_next[next_zone] = entering_next.get(next_zone, 0) + 1
                 moves.append(f"D{drone_id}-{next_zone}")
 
         # ── Commit normal/priority moves ──────────────────────────────────
         for drone_id, current_zone, next_zone in confirmed:
             self.zone_count[current_zone] -= 1
             self.zone_count[next_zone] += 1
-            self.turn_leving[next_zone] += 1
-            self.turn_leving[current_zone] -= 1
             self.drone_zone[drone_id] = next_zone
             self.drone_step[drone_id] += 1
 
