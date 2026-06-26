@@ -45,6 +45,7 @@ class Traffic():
         moves:      list[str] = []
         confirmed:  list[tuple[int, str, str]] = []
         just_arrived: set[int] = set()
+        restricted_departuse: list[tuple[str, str]] = []
 
         # drones leaving a zone this turn (normal moves + restricted departures)
         # used to compute free slots for restricted arrivals next turn
@@ -121,7 +122,8 @@ class Traffic():
                 turn_link[(current_zone, next_zone)] = (
                     turn_link.get((current_zone, next_zone), 0) + 1
                 )
-                self.zone_count[current_zone] -= 1
+                restricted_departuse.append((drone_id, current_zone))
+                # self.zone_count[current_zone] -= 1
                 self.drone_zone[drone_id] = conn
                 self.in_transit[drone_id] = (conn, next_zone)
                 # self.drone_step[drone_id] += 1#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -150,6 +152,8 @@ class Traffic():
                 moves.append(f"D{drone_id}-{next_zone}")
 
         # ── Commit normal/priority moves ──────────────────────────────────
+        for drone_id, current_zone in restricted_departuse:
+            self.zone_count[current_zone] -= 1
         for drone_id, current_zone, next_zone in confirmed:
             self.zone_count[current_zone] -= 1
             self.zone_count[next_zone] += 1
