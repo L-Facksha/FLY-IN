@@ -1,6 +1,52 @@
 from graph import Graph
 from traffic import Traffic
-from rich import print
+
+RESET = "\033[0m"
+color_map: dict[str, int] = {
+    "black": "\033[30m",
+    "red": "\033[31m",
+    "green": "\033[32m",
+    "yellow": "\033[33m",
+    "blue": "\033[34m",
+    "purple": "\033[35m",
+    "cyan": "\033[36m",
+    "white": "\033[37m",
+
+    # Bright ANSI
+    "bright_black": "\033[90m",
+    "bright_red": "\033[91m",
+    "bright_green": "\033[92m",
+    "bright_yellow": "\033[93m",
+    "bright_blue": "\033[94m",
+    "bright_purple": "\033[95m",
+    "bright_cyan": "\033[96m",
+    "bright_white": "\033[97m",
+
+    # Extended 256-color palette
+    "orange": "\033[38;5;208m",
+    "brown": "\033[38;5;94m",
+    "maroon": "\033[38;5;52m",
+    "gold": "\033[38;5;220m",
+    "darkred": "\033[38;5;88m",
+    "crimson": "\033[38;5;161m",
+    "violet": "\033[38;5;135m",
+    "gray": "\033[38;5;245m",
+    "pink": "\033[38;5;213m",
+    "teal": "\033[38;5;36m",
+    "lime": "\033[38;5;154m",
+    "indigo": "\033[38;5;54m",
+    "lavender": "\033[38;5;183m",
+    "salmon": "\033[38;5;209m",
+    "coral": "\033[38;5;203m",
+    "mint": "\033[38;5;121m",
+    'rainbow': "\033[38;5;213m",
+    "magenta":       "\033[38;5;201m",
+    "dark_magenta":  "\033[38;5;90m",
+    "hot_pink":      "\033[38;5;205m",
+    "fuchsia":       "\033[38;5;13m",
+    "orchid":        "\033[38;5;170m",
+    "plum":          "\033[38;5;176m",
+}
 
 
 class Simulator():
@@ -10,18 +56,24 @@ class Simulator():
 
     def colorize_zone(self, zone: str) -> str:
         if '-' in zone:
-            parts = zone.split('-')
-            current_zone = parts[0]
-            next_zone = parts[1]
+            current_zone, next_zone = zone.split('-', 1)
             current_zone_color = self.graph.zone_color.get(current_zone, '')
             next_zone_color = self.graph.zone_color.get(next_zone, '')
-            return f"[{current_zone_color}]{current_zone}[/{current_zone_color}]\
--[{next_zone_color}]{next_zone}[/{next_zone_color}]"
+            
+            current_zone_color = color_map.get(current_zone_color, '')
+
+            next_zone_color = color_map.get(next_zone_color, '')
+            return (
+                f"{current_zone_color}{current_zone}{RESET}"
+                "-"
+                f"{next_zone_color}{next_zone}{RESET}"
+            )
+            
         color_name = self.graph.zone_color.get(zone, '')
-        return f"[{color_name}]{zone}[/{color_name}]"
+        color_codde = color_map.get(color_name, RESET)
+        return f"{color_codde}{zone}{RESET}"
 
     def colorize_move(self, move: str) -> str:
-        # print(move)
         parts = move.split('-', 1)
         drone = parts[0]
         zone = parts[1]
