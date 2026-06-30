@@ -59,7 +59,7 @@ class Simulator():
             current_zone, next_zone = zone.split('-', 1)
             current_zone_color = self.graph.zone_color.get(current_zone, '')
             next_zone_color = self.graph.zone_color.get(next_zone, '')
-            
+
             current_zone_color = color_map.get(current_zone_color, '')
 
             next_zone_color = color_map.get(next_zone_color, '')
@@ -68,7 +68,7 @@ class Simulator():
                 "-"
                 f"{next_zone_color}{next_zone}{RESET}"
             )
-            
+
         color_name = self.graph.zone_color.get(zone, '')
         color_codde = color_map.get(color_name, RESET)
         return f"{color_codde}{zone}{RESET}"
