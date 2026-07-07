@@ -1,5 +1,9 @@
 from graph import Graph
 from traffic import Traffic
+from rich.console import Console
+from rich.panel import Panel
+from rich.align import Align
+from rich.rule import Rule
 
 RESET = "\033[0m"
 color_map: dict[str, int] = {
@@ -12,7 +16,6 @@ color_map: dict[str, int] = {
     "cyan": "\033[36m",
     "white": "\033[37m",
 
-    # Bright ANSI
     "bright_black": "\033[90m",
     "bright_red": "\033[91m",
     "bright_green": "\033[92m",
@@ -22,7 +25,6 @@ color_map: dict[str, int] = {
     "bright_cyan": "\033[96m",
     "bright_white": "\033[97m",
 
-    # Extended 256-color palette
     "orange": "\033[38;5;208m",
     "brown": "\033[38;5;94m",
     "maroon": "\033[38;5;52m",
@@ -81,14 +83,22 @@ class Simulator():
 
     def print_turns(self) -> None:
         turns = self.traffic.run()
+        panel = Panel(
+            Align.center('FLY-IN', style='bold green'), border_style="green"
+        )
+        console = Console()
+        console.print(panel)
         start_zone = self.colorize_zone(self.graph.start)
         initial = ' | '.join(
             f"D{d}-{start_zone}"
             for d in range(1, self.traffic.nb_drones + 1)
         )
-        print(initial)
-        for turn in turns:
-            colored = [self.colorize_move(mv) for mv in turn]
-            print(' | '.join(colored))
+        console.print(f"- TURN: 0", style='bold italic underline blue')
+        print(initial, '\n')
 
-        print(f"\nTotal turns: {len(turns)}")
+        for x, turn in enumerate(turns, 1):
+            colored = [self.colorize_move(mv) for mv in turn]
+            console.print(f"- TURN: {x}", style='bold italic underline blue')
+            print(' | '.join(colored), '\n')
+
+        console.print(f"Total turns: {len(turns)}", style='bold italic underline green')

@@ -1,5 +1,6 @@
 import sys
 import re
+from rich.console import Console
 from typing import Any
 from pathlib import Path
 RED = "\033[91m"
@@ -21,6 +22,7 @@ class Parser():
         self.zone_capacity: dict[str, int] = {}
         self.c_metadata: dict[str, int] = {}
         self.link_capacity: dict[tuple[str, str], int] = {}
+        self.console = Console()
 
     def load_file(self):
         try:
@@ -43,7 +45,7 @@ class Parser():
         nb = re.fullmatch(r"nb_drones:\s+(-?\d+)", line)
         if not nb:
             raise ValueError(
-                f"ERROR LINE {indx}: Invalid format nb_drones '{line}'")
+                f"ERROR: Invalid format nb_drones '{line}', line: {indx}")
 
         self.nb_drones = int(nb.group(1))
 
@@ -123,7 +125,7 @@ valid value:{allowed_zone}"
 
             if not extract:
                 raise ValueError(
-                    f"ERROR: Invalid format: '{line}', line {indx}")
+                    f"ERROR: Invalid format, line {indx}")
 
             self.start_hub = extract.group(1)
 
@@ -148,7 +150,7 @@ valid value:{allowed_zone}"
 
             if not extract:
                 raise ValueError(
-                    f"ERROR: Invalid format: '{line}', line {indx}")
+                    f"ERROR: Invalid format, line {indx}")
 
             zone_name = extract.group(1)
 
@@ -183,7 +185,7 @@ valid value:{allowed_zone}"
 
             if not extract:
                 raise ValueError(
-                    f"ERROR: Invalid format:{line}, line {indx}")
+                    f"ERROR: Invalid format, line {indx}")
 
             self.end_hub = extract.group(1)
 
@@ -210,7 +212,7 @@ valid value:{allowed_zone}"
             # print(line)
             if not extract:
                 raise ValueError(
-                    f"Invalide connection format:{line}, line {indx}")
+                    f"Invalide connection format, line {indx}")
 
             from_zone = extract.group(1)
             to_zone = extract.group(2)
@@ -236,8 +238,8 @@ valid value:{allowed_zone}"
                 check = re.fullmatch(r"max_link_capacity=(-?\d+)", metadata)
                 if not check:
                     raise ValueError(
-                        f"Invalid format: Usage [max_link_capacity=number],\
-                            line {indx}"
+                        f"Invalid format: Usage ['max_link_capacity=number'],\
+line {indx}"
                     )
 
                 capacity = int(check.group(1))
@@ -249,7 +251,7 @@ valid value:{allowed_zone}"
                 self.link_capacity[(from_zone, to_zone)] = capacity
 
         except Exception as error:
-            print(f"ERROR: {error}")
+            self.console.print(f"💥 ERROR: {error}", style='bold red')
             sys.exit(1)
 
     def parse_file(self):
@@ -309,7 +311,8 @@ valid value:{allowed_zone}"
             self.zone_capacity[self.end_hub] = self.nb_drones
 
         except Exception as error:
-            print(f"{error}")
+            self.console.print(f"💥 {error}", style='bold red')
+            sys.exit(1)
 
 
 # sel = Parser()
