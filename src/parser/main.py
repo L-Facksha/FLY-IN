@@ -20,5 +20,5 @@ t.run()
 
 s = Simulator(g, t)
 s.print_turns()
-# viz = Visualizer(g, turns)
+# viz = Visualizer(g, p, t)
 # viz.run()

@@ -93,7 +93,7 @@ class Simulator():
             f"D{d}-{start_zone}"
             for d in range(1, self.traffic.nb_drones + 1)
         )
-        console.print(f"- TURN: 0", style='bold italic underline blue')
+        console.print("- TURN: 0", style='bold italic underline blue')
         print(initial, '\n')
 
         for x, turn in enumerate(turns, 1):
@@ -101,4 +101,5 @@ class Simulator():
             console.print(f"- TURN: {x}", style='bold italic underline blue')
             print(' | '.join(colored), '\n')
 
-        console.print(f"Total turns: {len(turns)}", style='bold italic underline green')
+        console.print(f"Total turns: {len(turns)}",
+                      style='bold italic underline green')
