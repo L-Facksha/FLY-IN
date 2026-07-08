@@ -1,90 +1,52 @@
-# Fly-in — Drone Routing System
+# *This project has been created as part of the 42 curriculum by azebahad*
 
-*This project has been created as part of the 42 curriculum by L-Facksha.*
-
----
-
-## Algorithm Visualization
-
-[![Dijkstra Visualizer](https://img.shields.io/badge/▶%20Dijkstra-Interactive%20Visualizer-4f6ef7?style=for-the-badge)](https://l-facksha.github.io/FLY-IN/dijkstra.html)
-
-> Click the badge above to open the interactive Dijkstra step-by-step visualizer.
-> It shows exactly how the algorithm picks nodes, updates distances, and finds the shortest path.
-
----
+# FLY-IN
 
 ## Description
 
-Fly-in is a multi-drone routing system that navigates a fleet of drones from a start zone to a goal zone through a network of connected zones, minimizing the total number of simulation turns.
+FLY-IN is a drone traffic simulation project that models autonomous drones navigating through a network of interconnected hubs while respecting movement and capacity constraints.
 
-The system parses a custom map format, builds a weighted graph, finds optimal paths using Dijkstra's algorithm, and schedules drone movements while respecting all zone and connection capacity constraints.
+The objective is to transport all drones from a designated **start hub** to an **end hub** in the minimum number of simulation turns. The simulation considers several real-world constraints, including:
 
----
+- Zone capacities
+- Link capacities
+- Blocked zones
+- Restricted zones
+- Priority zones
 
-## How It Works
-
-### Pipeline
-
-```
-Input file → Parser → Graph → Dijkstra → Scheduler → Simulator → Output
-```
-
-| Step | File | Role |
-|---|---|---|
-| Parser | `parser.py` | Reads and validates the map file |
-| Graph | `graph.py` | Builds adjacency list with weighted edges |
-| Pathfinding | `dijkstra.py` | Finds shortest path per drone |
-| Scheduler | `scheduler.py` | Assigns paths and coordinates movement |
-| Simulator | `simulator.py` | Runs turn-by-turn, enforces all rules |
-| Entry point | `main.py` | Ties everything together |
-
-### Zone Types and Movement Costs
-
-| Zone type | Cost (turns) | Description |
-|---|---|---|
-| `normal` | 1 | Standard movement |
-| `priority` | 1 | Preferred in pathfinding |
-| `restricted` | 2 | Drone must complete transit next turn |
-| `blocked` | ∞ | Inaccessible — never entered |
+The project is implemented in **Python** using an object-oriented architecture and includes both a **terminal simulation**.
 
 ---
 
-## Algorithm
+## Features
 
-### Dijkstra's Algorithm
+- Complete map parser with validation
+- Weighted graph construction
+- Dijkstra shortest-path algorithm
+- Multiple shortest-path extraction
+- Multi-drone traffic scheduler
+- Capacity-aware routing
+- Support for blocked, restricted and priority zones
+- Colored terminal output using Rich
+- Interactive visualization using Pygame
+- Static type checking with mypy
+- Documentation using NumPy-style docstrings
 
-Dijkstra finds the shortest weighted path from start to goal. It always expands the node with the lowest total cost from the start, guaranteeing an optimal result on non-negative weighted graphs.
+---
 
-**Core formula:**
+## Project Structure
 
+```text
+.
+├── algorithm.py
+├── graph.py
+├── parser.py
+├── traffic.py
+├── simulator.py
+├── main.py
+├── maps/
+└── README.md
 ```
-f(n) = g(n)
-
-where g(n) = actual cost from start to node n
-```
-
-**Step-by-step:**
-
-1. Set `dist[start] = 0`, all others `= ∞`
-2. Pick the unvisited node with the lowest `dist`
-3. For each neighbor: `new_cost = dist[current] + edge_cost`
-4. If `new_cost < dist[neighbor]` → update it
-5. Mark current as visited
-6. Repeat until goal is reached
-7. Reconstruct path using `prev` pointers
-
-**Interactive visualization:**
-
-[![Dijkstra Visualizer](https://img.shields.io/badge/▶%20Try%20it-Step%20through%20Dijkstra-4f6ef7?style=flat-square)](https://l-facksha.github.io/FLY-IN/dijkstra.html)
-
-### Multi-Drone Scheduling
-
-Dijkstra gives the best path per drone. The scheduler then coordinates all drones to:
-
-- Avoid exceeding zone capacity (`max_drones`)
-- Avoid exceeding connection capacity (`max_link_capacity`)
-- Handle restricted zones (2-turn transit, no waiting mid-connection)
-- Prevent deadlocks
 
 ---
 
@@ -92,122 +54,176 @@ Dijkstra gives the best path per drone. The scheduler then coordinates all drone
 
 ### Requirements
 
-- Python 3.10 or later
-- `flake8` and `mypy` for linting
+- Python 3.10+
+- pip
 
-### Install
+### Install dependencies
 
 ```bash
 make install
 ```
 
-### Run
+### Run the simulation
 
 ```bash
-make run maps/easy/01_linear.txt
-```
-
-### Debug
-
-```bash
-make debug maps/easy/01_linear.txt
-```
-
-### Lint
-
-```bash
-make lint
-```
-
-### Clean
-
-```bash
-make clean
+python3 main.py <path_map>
+or 
+make run ARGS<path_map>
 ```
 
 ---
 
-## Map Format
+## Input Format
 
+Example map:
+
+```text
+nb_drones: 5
+
+start_hub: A 0 0 [color=green]
+
+hub: B 4 0 [zone=priority]
+
+hub: C 8 0 [zone=restricted]
+
+end_hub: D 12 0 [color=red]
+
+connection: A-B
+connection: B-C
+connection: C-D
 ```
-nb_drones: 4
-
-start_hub: start 0 0 [color=green]
-hub: junction 1 0 [color=yellow max_drones=2]
-hub: path_a 2 1 [color=blue]
-end_hub: goal 3 0 [color=red max_drones=3]
-
-connection: start-junction [max_link_capacity=2]
-connection: junction-path_a
-connection: path_a-goal
-```
-
-**Zone metadata (all optional):**
-- `zone=<normal|priority|restricted|blocked>` — default: `normal`
-- `max_drones=<N>` — default: `1`
-- `color=<value>` — for visual output
-
-**Connection metadata (optional):**
-- `max_link_capacity=<N>` — default: `1`
 
 ---
 
-## Output Format
+# Algorithm Choices and Implementation Strategy
 
-Each line represents one simulation turn, listing all drone movements:
+## 1. Parser
 
-```
-D1-roof1 D2-corridorA
-D1-roof2 D2-tunnelB
-D1-goal D2-goal
-```
+The parser is responsible for reading and validating the map file before the simulation begins.
 
-- `D<ID>-<zone>` — drone reached a zone
-- `D<ID>-<connection>` — drone in transit toward a restricted zone
-- Drones that do not move are omitted
-- Drones that reach the goal are no longer tracked
+It verifies:
+
+- number of drones
+- hub declarations
+- coordinates
+- metadata
+- capacities
+- graph connections
+
+Invalid maps immediately generate descriptive errors.
 
 ---
 
-## Performance Targets
+## 2. Graph Construction
 
-| Difficulty | Map | Target |
-|---|---|---|
-| Easy | Linear path (2 drones) | ≤ 6 turns |
-| Easy | Simple fork (4 drones) | ≤ 8 turns |
-| Easy | Basic capacity (4 drones) | ≤ 6 turns |
-| Medium | Dead end trap (5 drones) | ≤ 12 turns |
-| Medium | Circular loop (6 drones) | ≤ 15 turns |
-| Hard | Maze nightmare (8 drones) | ≤ 30 turns |
-| Hard | Capacity hell (12 drones) | ≤ 35 turns |
-| Challenger | The Impossible Dream (25 drones) | ≤ 45 turns |
+The validated map is transformed into a weighted graph.
+
+The graph stores:
+
+- adjacency list
+- movement costs
+- zone capacities
+- link capacities
+- zone colors
+- zone types
+
+Movement costs are assigned according to the destination zone:
+
+| Zone Type | Cost |
+|-----------|-----:|
+| Normal | 1 |
+| Priority | 1 |
+| Restricted | 2 |
+| Blocked | ∞ |
+
+Blocked zones are removed from the graph.
+
+---
+
+## 3. Pathfinding
+
+The project uses **Dijkstra's algorithm**.
+
+First, Dijkstra computes the minimum distance from the start hub to every reachable hub.
+
+A Depth-First Search (DFS) is then performed to reconstruct every shortest path.
+
+When several shortest paths exist, they are ordered according to:
+
+1. Number of priority zones.
+2. Path length.
+
+This allows drones to naturally prefer routes containing priority zones.
+
+---
+
+## 4. Traffic Scheduling
+
+The simulation proceeds one turn at a time.
+
+For every turn:
+
+- drones currently travelling through restricted zones are updated;
+- each remaining drone attempts to move;
+- link capacities are verified;
+- zone capacities are checked;
+- restricted zones require two turns to traverse;
+- deadlocks are detected automatically.
+
+The scheduler maximizes simultaneous movements while respecting every project constraint.
+
+---
+
+## Visual Representation
+
+## Terminal Interface
+
+The terminal interface combines **ANSI escape codes** and the **Rich** library to provide a clear and visually appealing simulation output.
+
+**ANSI escape codes** are used to color zone names according to their configured metadata, making it easy to distinguish hubs and follow drone movements.
+
+The **Rich** library is used to improve the presentation of the simulation by displaying:
+
+- a formatted title panel;
+- styled turn headers;
+- organized turn-by-turn output;
+- the final simulation statistics.
+
+This combination enhances readability while keeping the simulation lightweight and easy to follow directly from the terminal.
+
+
+## Technologies
+
+- Python
+- Rich
+- mypy
+- Ruff
 
 ---
 
 ## Resources
 
-### Dijkstra's Algorithm
-- [Computerphile — Dijkstra's Algorithm (YouTube)](https://www.youtube.com/watch?v=GazC3A4OQTE)
-- [Abdul Bari — Dijkstra (YouTube)](https://www.youtube.com/watch?v=XB4MIexjvY0)
-- [VisuAlgo — Interactive SSSP Visualizer](https://visualgo.net/en/sssp)
-- [cp-algorithms.com — Dijkstra](https://cp-algorithms.com/graph/dijkstra.html)
+### Documentation
 
-### Multi-Agent Pathfinding
-- [MAPF — Multi-Agent Pathfinding Overview](https://www.movingai.com/MAPF/)
+- Python Documentation: https://docs.python.org/3/
+- Rich Documentation: https://rich.readthedocs.io/
+- mypy Documentation: https://mypy.readthedocs.io/
+- DSA Dijkstra's Algorithm: https://www.w3schools.com/dsa/dsa_algo_graphs_dijkstra.php
+- DFS Algorithm: https://www.codecademy.com/article/depth-first-search-dfs-algorithm
+- DFS visualization: https://www.cs.usfca.edu/~galles/visualization/DFS.html
 
-### Python Tools
-- [flake8 documentation](https://flake8.pycqa.org/)
-- [mypy documentation](https://mypy.readthedocs.io/)
+### Algorithms
+
+- Dijkstra's Algorithm
+- Graph Theory
+- Depth-First Search (DFS)
+
+### AI Usage
+
+AI assistance was primarily used for:
+
+- explaining the theory and implementation of **Dijkstra's algorithm**, including how shortest paths are computed and reconstructed.
+- explaining how **Depth-First Search (DFS)** is used to enumerate all shortest paths after the shortest distances have been calculated.
+- improving understanding of graph algorithms and their application to drone routing.
 
 ---
-
-## AI Usage
-
-AI (Claude by Anthropic) was used during this project for:
-
-- **Understanding algorithms** — Dijkstra explained step by step with visualizations
-- **Code review** — Parser and graph class reviewed for bugs and edge cases
-- **Debugging** — Identifying silent error swallowing, wrong cost direction, missing defaults
-- **Clarifying concepts** — Zone capacity defaults, bidirectional edges, cost assignment
-
-All generated suggestions were reviewed, tested, and adapted manually. No code was copied without full understanding.

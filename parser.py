@@ -7,7 +7,20 @@ RED = "\033[91m"
 
 
 class Parser():
+    """
+    Parse and validate a drone map file.
+
+    The parser reads a map description, validates its syntax,
+    extracts hubs, connections, metadata, and capacities, and
+    stores the resulting information for use by the simulation.
+    """
     def __init__(self):
+        """
+        Initialize an empty parser.
+
+        Creates the data structures used to store the parsed map,
+        hub metadata, connections, capacities, and coordinates.
+        """
         self.map: str = ""
         self.nb_drones: int = 0
         self.start_hub: str = ""
@@ -25,9 +38,29 @@ class Parser():
         self.console = Console()
 
     def load_file(self):
+        """
+        Load the map file specified on the command line.
+
+        The file contents are read and stored in the parser for
+        subsequent parsing.
+
+        Raises
+        ------
+        ValueError
+            If no map file is provided.
+        FileNotFoundError
+            If the specified file does not exist.
+        SystemExit
+            If an unrecoverable error occurs.
+        """
         try:
             if len(sys.argv) < 2:
-                raise ValueError("Usage: python3 main.py <path_map>")
+                raise ValueError(
+                    "Missing <path_map>:\n"
+                    "Usage: python3 main.py <path_map>\n"
+                    "       OR\n"
+                    "       make run ARGS=<path_map>"
+                )
 
             path = Path(sys.argv[1])
 
@@ -38,10 +71,26 @@ class Parser():
                 self.map = f.read()
 
         except Exception as error:
-            print(f"{error}")
+            self.console.print(f"💥 {error}", style='bold red')
             sys.exit(1)
 
-    def parse_nb_drones(self, line, indx):
+    def _parse_nb_drones(self, line: str, indx: int) -> None:
+        """
+        Parse the number of drones.
+
+        Parameters
+        ----------
+        line : str
+            Line containing the ``nb_drones`` declaration.
+        indx : int
+            Line number in the map file.
+
+        Raises
+        ------
+        ValueError
+            If the declaration is malformed or the number of
+            drones is not positive.
+        """
         nb = re.fullmatch(r"nb_drones:\s+(-?\d+)", line)
         if not nb:
             raise ValueError(
@@ -52,7 +101,25 @@ class Parser():
         if self.nb_drones <= 0:
             raise ValueError(f"ERROR: nb_drones must be positive, line {indx}")
 
-    def parse_metadata(self, zone_name, line, indx):
+    def parse_metadata(self, zone_name: str, line: str, indx: int) -> None:
+        """
+        Parse metadata associated with a hub.
+
+        Parameters
+        ----------
+        zone_name : str
+            Name of the hub whose metadata is being parsed.
+        line : str
+            Line containing the metadata.
+        indx : int
+            Line number in the map file.
+
+        Raises
+        ------
+        ValueError
+            If the metadata contains invalid keys, values,
+            duplicate entries, or malformed syntax.
+        """
         allowed = ['zone', 'color', 'max_drones']
         allowed_zone = ['priority', 'restricted', 'normal', 'blocked']
         extract = re.findall(r"\[(.*?)\]", line)[-1]
@@ -111,7 +178,23 @@ valid value:{allowed_zone}"
 
         self.zone_metadata[zone_name] = data
 
-    def parse_hubs(self, line, indx):
+    def _parse_hubs(self, line: str, indx: int) -> None:
+        """
+        Parse a start hub, hub, or end hub declaration.
+
+        Parameters
+        ----------
+        line : str
+            Line describing a hub.
+        indx : int
+            Line number in the map file.
+
+        Raises
+        ------
+        ValueError
+            If the hub declaration is invalid, duplicated,
+            or uses duplicate coordinates.
+        """
         if line.startswith("start_hub"):
             if self.start_hub:
                 raise ValueError(
@@ -204,7 +287,25 @@ valid value:{allowed_zone}"
             if re.search(r"\[.*\]", line):
                 self.parse_metadata(self.end_hub, line, indx)
 
-    def parse_connection(self, line, indx):
+    def _parse_connection(self, line: str, indx: int) -> None:
+        """
+        Parse a connection between two hubs.
+
+        Parameters
+        ----------
+        line : str
+            Line describing a connection.
+        indx : int
+            Line number in the map file.
+
+        Raises
+        ------
+        ValueError
+            If the connection is invalid, duplicated,
+            references unknown hubs, or has invalid metadata.
+        SystemExit
+            If an unrecoverable parsing error occurs.
+        """
         try:
             extract = re.fullmatch(
                 r"connection:\s([^\s-]+)-([^\s-]+)(\s\[(.*?)\])?", line)
@@ -255,6 +356,21 @@ line {indx}"
             sys.exit(1)
 
     def parse_file(self):
+        """
+        Parse the loaded map.
+
+        Processes every line of the map, validates its syntax,
+        extracts hubs, connections, metadata, and capacities,
+        and initializes default values where necessary.
+
+        Raises
+        ------
+        ValueError
+            If the map contains invalid declarations, missing
+            required fields, or inconsistent data.
+        SystemExit
+            If an unrecoverable parsing error occurs.
+        """
         nb_drones = False
         try:
             lines = self.map.splitlines()
@@ -275,11 +391,11 @@ line {indx}"
                     filter_line = line.split('#', 1)[0].strip()
                     nb_drones = True
 
-                    self.parse_nb_drones(filter_line, indx)
+                    self._parse_nb_drones(filter_line, indx)
 
                 elif first_word == "connection":
                     filter_line = line.split('#', 1)[0].strip()
-                    self.parse_connection(filter_line, indx)
+                    self._parse_connection(filter_line, indx)
 
                 elif first_word not in ('start_hub', 'hub', 'end_hub'):
                     raise ValueError(
@@ -287,7 +403,7 @@ line {indx}"
 
                 elif first_word in ('start_hub', 'hub', 'end_hub'):
                     filter_line = line.split('#', 1)[0].strip()
-                    self.parse_hubs(filter_line, indx)
+                    self._parse_hubs(filter_line, indx)
 
             if not nb_drones:
                 raise ValueError(
