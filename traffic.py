@@ -207,27 +207,19 @@ class Traffic():
             Sequence of simulation turns, where each turn contains the
             movements performed by the drones.
 
-        Raises
-        ------
-        SystemExit
-            Raised after printing an error message if the simulation
-            cannot continue because of an exception or deadlock.
-
         """
         try:
             console = Console()
             self._construction_paths()
             turns: list[list[str]] = []
 
-            for _ in range(100000):
+            for _ in range(self.nb_drones * 10):
                 if all(self.drone_zone[d] == self.graph.end
                         for d in range(1, self.nb_drones + 1)):
                     break
                 moves = self._plan_turn()
                 if moves:
                     turns.append(moves)
-                else:
-                    raise ValueError("Deadlock — no drone can move")
 
             return turns
 

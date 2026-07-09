@@ -153,6 +153,7 @@ class Simulator():
         )
         console = Console()
         console.print(panel)
+
         start_zone = self._colorize_zone(self.graph.start)
         initial = ' | '.join(
             f"D{d}-{start_zone}"

@@ -14,7 +14,8 @@ class Parser():
     extracts hubs, connections, metadata, and capacities, and
     stores the resulting information for use by the simulation.
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         """
         Initialize an empty parser.
 
@@ -37,7 +38,7 @@ class Parser():
         self.link_capacity: dict[tuple[str, str], int] = {}
         self.console = Console()
 
-    def load_file(self):
+    def load_file(self) -> None:
         """
         Load the map file specified on the command line.
 
@@ -46,8 +47,6 @@ class Parser():
 
         Raises
         ------
-        ValueError
-            If no map file is provided.
         FileNotFoundError
             If the specified file does not exist.
         SystemExit
@@ -122,26 +121,26 @@ class Parser():
         """
         allowed = ['zone', 'color', 'max_drones']
         allowed_zone = ['priority', 'restricted', 'normal', 'blocked']
-        extract = re.findall(r"\[(.*?)\]", line)[-1]
+        extract = re.fullmatch(r"[^\[]*\[([^\[\]]+)\]", line)
 
         if not extract:
             raise ValueError(
                 f"Invalid metadata format, line {indx}\n\
 Metadata mus be inside []"
             )
-        metadata = extract.split(" ")
+        metadata = extract.group(1).split(" ")
 
         data = {}
 
         for item in metadata:
             if "=" not in item:
                 raise ValueError(
-                    f"Invalid metadata entry: '{item}', line {indx}"
+                    f"Invalid metadata entry, line {indx}"
                 )
             parts = item.split("=")
             if len(parts) != 2:
                 raise ValueError(
-                    f"Invalid metadat entry: '{item}', line {indx}"
+                    f"Invalid metadat entry, line {indx}"
                 )
 
             key, val = parts
@@ -202,7 +201,7 @@ valid value:{allowed_zone}"
                 )
 
             extract = re.fullmatch(
-                r"start_hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)\s(\[(.*?)\])?",
+                r"start_hub:\s([^\s-]+)\s(-?\d+)\s(-?\d+)(\s\[(.*?)\])?",
                 line
             )
 
@@ -229,7 +228,7 @@ valid value:{allowed_zone}"
 
         elif line.startswith("hub"):
             extract = re.fullmatch(
-                r"hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)\s(\[(.*?)\])?", line)
+                r"hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)(\s\[(.*?)\])?", line)
 
             if not extract:
                 raise ValueError(
@@ -262,7 +261,7 @@ valid value:{allowed_zone}"
                     f"Multiple end_hub declarations, line {indx}"
                 )
             extract = re.fullmatch(
-                r"end_hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)\s(\[(.*?)\])?",
+                r"end_hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)(\s\[(.*?)\])?",
                 line
             )
 
@@ -310,7 +309,6 @@ valid value:{allowed_zone}"
             extract = re.fullmatch(
                 r"connection:\s([^\s-]+)-([^\s-]+)(\s\[(.*?)\])?", line)
 
-            # print(line)
             if not extract:
                 raise ValueError(
                     f"Invalide connection format, line {indx}")
@@ -355,7 +353,7 @@ line {indx}"
             self.console.print(f"💥 ERROR: {error}", style='bold red')
             sys.exit(1)
 
-    def parse_file(self):
+    def parse_file(self) -> None:
         """
         Parse the loaded map.
 
@@ -423,25 +421,17 @@ line {indx}"
                 self.zone_type[zone] = meta.get('zone', 'normal')
                 if zone not in self.zone_capacity:
                     self.zone_capacity[zone] = meta.get('max_drones', 1)
+
             self.zone_capacity[self.start_hub] = self.nb_drones
+            if self.zone_capacity[self.start_hub] > \
+                    self.zone_capacity[self.end_hub]:
+                self.console.print(
+                    f"✏️  Set the capacities of the Start and End hubs to \
+Number of drones -> {self.nb_drones}.",
+                    style='bold yellow'
+                )
             self.zone_capacity[self.end_hub] = self.nb_drones
 
         except Exception as error:
             self.console.print(f"💥 {error}", style='bold red')
             sys.exit(1)
-
-
-# sel = Parser()
-# sel.load_file()
-# sel.parse_file()
-# print(sel.nb_drones)
-# print(sel.start_hub)
-# print(sel.end_hub)
-# print(sel.zone_coords)
-# print(sel.zone_metadata)
-# print(sel.zone_capacity)
-# print(sel.connection)
-# print("\n", "*"*197)
-# print(sel.zones)
-# print(sel.link_capacity)
-# print(sel.zone_type)
