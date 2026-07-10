@@ -100,12 +100,15 @@ class Parser():
         if self.nb_drones <= 0:
             raise ValueError(f"ERROR: nb_drones must be positive, line {indx}")
 
-    def parse_metadata(self, zone_name: str, line: str, indx: int) -> None:
+    def parse_metadata(self, ignor_s_e: str, zone_name: str,
+                       line: str, indx: int) -> None:
         """
         Parse metadata associated with a hub.
 
         Parameters
         ----------
+        ignor_s_e: str
+            Containing start_hub or end_hub
         zone_name : str
             Name of the hub whose metadata is being parsed.
         line : str
@@ -156,12 +159,14 @@ valid keys:{allowed}"
                         f"Invalid value: '{val}', line {indx}\n\
 valid value:{allowed_zone}"
                     )
-            if key == "max_drones":
-                if not val.isdigit() or int(val) <= 0:
-                    raise ValueError(
-                        f"Metadata value must be positive number: \
+
+            if ignor_s_e == 'hub':
+                if key == "max_drones":
+                    if not val.isdigit() or int(val) <= 0:
+                        raise ValueError(
+                            f"Metadata value must be positive number: \
 '{key}={val}', line {indx}"
-                    )
+                        )
 
             if key == 'color':
                 if val == '':
@@ -201,7 +206,7 @@ valid value:{allowed_zone}"
                 )
 
             extract = re.fullmatch(
-                r"start_hub:\s([^\s-]+)\s(-?\d+)\s(-?\d+)(\s\[(.*?)\])?",
+                r"start_hub:\s([^\s-]+)\s([-+]?\d+)\s([-+]?\d+)(\s\[(.*?)\])?",
                 line
             )
 
@@ -224,11 +229,12 @@ valid value:{allowed_zone}"
             line = line.split(self.start_hub)[-1]
 
             if "=" in line or "[" in line or "]" in line:
-                self.parse_metadata(self.start_hub, line, indx)
+                self.parse_metadata('start_hub', self.start_hub, line, indx)
 
         elif line.startswith("hub"):
             extract = re.fullmatch(
-                r"hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)(\s\[(.*?)\])?", line)
+                r"hub:\s([^\s-]+)\s([-+]?\d+)\s+([-+]?\d+)(\s\[(.*?)\])?",
+                line)
 
             if not extract:
                 raise ValueError(
@@ -253,7 +259,7 @@ valid value:{allowed_zone}"
             line = line.split(zone_name)[-1]
 
             if "=" in line or "[" in line or "]" in line:
-                self.parse_metadata(zone_name, line, indx)
+                self.parse_metadata('hub', zone_name, line, indx)
 
         elif line.startswith("end_hub"):
             if self.end_hub:
@@ -261,7 +267,7 @@ valid value:{allowed_zone}"
                     f"Multiple end_hub declarations, line {indx}"
                 )
             extract = re.fullmatch(
-                r"end_hub:\s([^\s-]+)\s(-?\d+)\s+(-?\d+)(\s\[(.*?)\])?",
+                r"end_hub:\s([^\s-]+)\s([-+]?\d+)\s+([-+]?\d+)(\s\[(.*?)\])?",
                 line
             )
 
@@ -284,7 +290,7 @@ valid value:{allowed_zone}"
             line = line.split(self.end_hub)[-1]
 
             if re.search(r"\[.*\]", line):
-                self.parse_metadata(self.end_hub, line, indx)
+                self.parse_metadata('end_hub', self.end_hub, line, indx)
 
     def _parse_connection(self, line: str, indx: int) -> None:
         """
@@ -423,14 +429,15 @@ line {indx}"
                     self.zone_capacity[zone] = meta.get('max_drones', 1)
 
             self.zone_capacity[self.start_hub] = self.nb_drones
-            if self.zone_capacity[self.start_hub] > \
-                    self.zone_capacity[self.end_hub]:
-                self.console.print(
-                    f"✏️  Set the capacities of the Start and End hubs to \
-Number of drones -> {self.nb_drones}.",
-                    style='bold yellow'
-                )
             self.zone_capacity[self.end_hub] = self.nb_drones
+
+            self.console.print(
+                f"✏️  Set the capacities of the Start and End hubs to \
+Number of drones -> {self.nb_drones}.",
+                style='bold yellow'
+            )
+            self.console.print("🎨🖌️  Zone uses a default color (white) if \
+you provide an unknown color.", style='bold cyan')
 
         except Exception as error:
             self.console.print(f"💥 {error}", style='bold red')

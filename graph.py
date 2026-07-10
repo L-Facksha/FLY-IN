@@ -14,6 +14,7 @@ class Graph():
     parser : Parser
         Parser containing the validated map data.
     """
+
     def __init__(self, parser: Parser) -> None:
         """
         Initialize an empty graph.

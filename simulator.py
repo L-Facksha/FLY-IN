@@ -65,6 +65,7 @@ class Simulator():
     traffic : Traffic
         Object responsible for computing the movement schedule.
     """
+
     def __init__(self, graph: Graph, traffic: Traffic) -> None:
         """
         Initialize the simulator.

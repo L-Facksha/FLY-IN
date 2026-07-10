@@ -15,6 +15,7 @@ class Dijkstra:
     graph : Graph
         Graph used for pathfinding.
     """
+
     def __init__(self, graph: Graph) -> None:
         """
         Initialize the pathfinding algorithm.
