@@ -1,4 +1,4 @@
-V# *This project has been created as part of the 42 curriculum by azebahad*
+*This project has been created as part of the 42 curriculum by azebahad*
 
 # FLY-IN
 
