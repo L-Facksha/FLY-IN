@@ -1,4 +1,4 @@
-# *This project has been created as part of the 42 curriculum by azebahad*
+V# *This project has been created as part of the 42 curriculum by azebahad*
 
 # FLY-IN
 
@@ -66,7 +66,7 @@ make install
 ### Run the simulation
 
 ```bash
-python3 main.py <path_map>
+uv run main.py <path_map>
 or 
 make run ARGS<path_map>
 ```

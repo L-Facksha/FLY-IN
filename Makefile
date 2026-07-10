@@ -2,7 +2,7 @@ install:
 	uv sync
 
 run:
-	python3 main.py $(ARGS)
+	uv run main.py $(ARGS)
 
 debug:
 	python3 -m pdb main.py $(ARGS)
