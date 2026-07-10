@@ -1,5 +1,5 @@
 .vscode/
 __pycache__/
 .venv/
-uv.lock/
+uv.lock
 .mypy_cache/
