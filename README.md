@@ -12,103 +12,178 @@
 
 </div>
 
+<p align="center"><b>Route a fleet of drones from one hub to another through a constrained network, in as few turns as possible.</b></p>
+
+---
+
+## 📑 Table of Contents
+
+- [Description](#-description)
+- [Key Features](#-key-features)
+- [Tech Stack](#️-tech-stack)
+- [Project Structure](#️-project-structure)
+- [Getting Started](#️-getting-started)
+- [Usage](#-usage)
+- [Map Format](#️-map-format)
+- [Output Format](#-output-format)
+- [How It Works](#-how-it-works)
+- [Visual Representation](#-visual-representation)
+- [Testing and Code Quality](#-testing-and-code-quality)
+- [Performance Results](#-performance-results)
+- [Possible Improvements](#-possible-improvements)
+- [Resources](#-resources)
+
 ---
 
 ## 📋 Description
 
-**Fly-in** is a multi-drone routing simulation written in Python. The goal is to move a fleet of drones from a single **start zone** to a single **goal zone** through a network of connected zones, minimizing the total number of simulation turns.
+**Fly-in** is a multi-drone routing simulation written in Python. A fleet of drones starts in a single **start hub** and has to reach a single **end hub** through a network of connected zones. The goal is to get every drone to the end hub in the **fewest simulation turns** possible.
 
-The system:
-- Reads a custom map file format defining zones, connections, capacities, and zone types
-- Computes optimal paths for each drone using **Dijkstra's algorithm + DFS**
-- Schedules drone movement turn by turn respecting all constraints
-- Displays results in a **colored terminal output** and an optional **graphical interface**
+Each zone and connection can have constraints: zone type, maximum number of drones in a zone, and maximum number of drones on a connection in the same turn.
+
+The program:
+
+1. Reads and validates a map file written in a custom text format.
+2. Builds a weighted, undirected graph of the zones.
+3. Finds **all shortest paths** with **Dijkstra's algorithm followed by a DFS**.
+4. Spreads the drones over those paths and simulates their movement turn by turn, respecting every capacity constraint.
+5. Prints each turn in **colored terminal output**. An optional **Pygame visualizer** animates the same simulation.
 
 ### Zone Types
 
 | Type | Cost (turns) | Description |
 |---|---|---|
-| `normal` | 1 | Standard zone — default type |
-| `priority` | 1 | Preferred in pathfinding over normal zones |
-| `restricted` | 2 | Drone enters link on turn 1, arrives on turn 2 |
-| `blocked` | ∞ | Inaccessible — drones cannot enter |
+| `normal` | 1 | Standard zone (default type) |
+| `priority` | 1 | Same cost as `normal`, but paths with more priority zones are tried first |
+| `restricted` | 2 | The drone enters the connection on turn 1 and arrives on turn 2 |
+| `blocked` | ∞ | Inaccessible: removed from the graph, drones cannot enter |
 
 ---
 
-## 🗂️ File Structure
+## ✨ Key Features
+
+- **Strict map parser**: regex-based validation with clear error messages and line numbers.
+- **Optimal pathfinding**: Dijkstra distances plus a DFS that lists *every* shortest path, not just one.
+- **Load balancing**: drones are assigned to the shortest paths in round-robin order to use several routes at once.
+- **Capacity-aware simulation**: zone capacity (`max_drones`) and connection capacity (`max_link_capacity`) are enforced on every turn.
+- **Two-turn restricted moves**: drones in transit to a restricted zone are shown on the connection, then on the zone.
+- **Colored terminal output**: each zone is printed in the color declared in the map, using ANSI codes and [Rich](https://rich.readthedocs.io/).
+- **Pygame visualizer** (`viz.py`): animated drones, playback controls, tooltips, and a live zone editor.
+- **Interactive Dijkstra page** (`dijkstra.html`): a browser page that runs Dijkstra step by step on an editable sample graph.
+
+---
+
+## 🛠️ Tech Stack
+
+| Tool | Role |
+|---|---|
+| **Python** | Language (the code uses modern type hints such as `str \| None` and `list[str]`) |
+| **[uv](https://docs.astral.sh/uv/)** | Dependency and virtual environment manager (`make install`, `make run`) |
+| **[Rich](https://rich.readthedocs.io/)** | Styled terminal output (header panel, turn labels, errors) |
+| **[Pygame](https://www.pygame.org/)** | Graphical visualizer (`viz.py`, optional) |
+| **[flake8](https://flake8.pycqa.org/)** / **[mypy](https://mypy.readthedocs.io/)** | Style checks and static type checks (`make lint`) |
+| **HTML / CSS / JavaScript (SVG)** | Standalone Dijkstra visualizer (`dijkstra.html`) |
+| **Make** | Task shortcuts |
+
+---
+
+## 🗂️ Project Structure
 
 ```
 FLY-IN/
-├── main.py           — entry point
-├── parser.py         — map file parser and validator
-├── graph.py          — weighted graph structure
-├── algorithm.py      — Dijkstra + DFS pathfinding
-├── traffic.py        — multi-drone simulation engine
+├── main.py           — entry point: runs Parser → Graph → Dijkstra → Traffic → Simulator
+├── parser.py         — reads and validates the map file
+├── graph.py          — weighted graph: adjacency list, costs, capacities, colors
+├── algorithm.py      — Dijkstra + DFS: lists all shortest paths
+├── traffic.py        — turn-by-turn multi-drone simulation
 ├── simulator.py      — colored terminal output
-├── visualizer.py     — pygame graphical interface
-├── dijkstra.html     — interactive algorithm visualizer
+├── viz.py            — Pygame graphical visualizer
+├── dijkstra.html     — interactive Dijkstra visualizer (browser)
+├── maps.tar.gz       — archive of test maps (see below)
+├── en.subject.pdf    — project subject (42)
+├── pyproject.toml    — project metadata and dependencies
 ├── Makefile
-├── README.md
-└── maps/
-    ├── easy/
-    ├── medium/
-    ├── hard/
-    └── challenger/
+└── README.md
+```
+
+The `maps.tar.gz` archive extracts to a `maps/` folder:
+
+```
+maps/
+├── README.md       — description of every map and its challenges
+├── easy/           — 01_linear_path, 02_simple_fork, 03_basic_capacity
+├── medium/         — 01_dead_end_trap, 02_circular_loop, 03_priority_puzzle
+├── hard/           — 01_maze_nightmare, 02_capacity_hell, 03_ultimate_challenge
+└── challenger/     — 01_the_impossible_dream
 ```
 
 ---
 
-## ⚙️ Instructions
+## ⚙️ Getting Started
 
 ### Requirements
 
-- Python **3.10** or later
-- `uv` package manager
-- `rich` — styled terminal output
-- `pygame` — graphical interface *(optional)*
+- **Python 3**: the code runs on Python 3.10+, but `pyproject.toml` sets `requires-python = ">=3.13"`, so `uv sync` sets up Python 3.13 or later.
+- **[uv](https://docs.astral.sh/uv/)** package manager
+- Dependencies declared in `pyproject.toml`: `rich`, `flake8`, `mypy`
+- `pygame`: needed **only** for the graphical visualizer. It is **not** listed in `pyproject.toml`, so install it separately.
 
-### Install
+### Installation
 
 ```bash
+git clone https://github.com/L-Facksha/FLY-IN.git
+cd FLY-IN
+
+# Install the dependencies listed in pyproject.toml (runs `uv sync`)
 make install
+
+# Extract the test maps into ./maps
+tar -xzf maps.tar.gz
 ```
 
-### Run
+To use the graphical visualizer, add Pygame to the environment:
+
+```bash
+uv pip install pygame
+```
+
+---
+
+## 🚀 Usage
+
+### Run a simulation
 
 ```bash
 make run ARGS=maps/easy/02_simple_fork.txt
 ```
 
-Or directly:
+Or run it directly in the uv environment:
 
 ```bash
-python3 main.py maps/easy/02_simple_fork.txt
+uv run main.py maps/easy/02_simple_fork.txt
 ```
 
-### Graphical Visualizer
+`python3 main.py <path_map>` also works if `rich` is installed in your active environment. If no map path is given, the program prints the usage and exits.
+
+### Launch the graphical visualizer
 
 ```bash
-python3 visualizer.py maps/easy/02_simple_fork.txt
+uv run viz.py maps/easy/02_simple_fork.txt
 ```
 
-### Debug
+### Open the Dijkstra visualizer
 
-```bash
-make debug ARGS=maps/easy/02_simple_fork.txt
-```
+Open it online with the badge at the top of this README, or open [`dijkstra.html`](dijkstra.html) in any browser. No server is needed.
 
-### Lint
+### Makefile targets
 
-```bash
-make lint
-make lint-strict   # optional — stricter mypy checks
-```
-
-### Clean
-
-```bash
-make clean
-```
+| Command | Description |
+|---|---|
+| `make install` | Install dependencies with `uv sync` |
+| `make run ARGS=<map>` | Run the simulation on a map |
+| `make debug ARGS=<map>` | Run the simulation in the `pdb` debugger |
+| `make lint` | Run `flake8` and `mypy` with strict typing flags |
+| `make clean` | Remove `__pycache__`, `.mypy_cache`, `.ruff_cache`, `.vscode`, and `*.pyc` files |
 
 ---
 
@@ -130,13 +205,26 @@ connection: path_a-goal
 connection: path_b-goal
 ```
 
-**Zone metadata** *(all optional)*:
-- `zone=<normal|priority|restricted|blocked>` — default: `normal`
-- `max_drones=<N>` — default: `1` *(start and goal always accept all drones)*
-- `color=<name>` — any single-word color name for visual output
+| Line | Syntax | Rules |
+|---|---|---|
+| Drone count | `nb_drones: <N>` | Required, declared once, must be positive |
+| Start hub | `start_hub: <name> <x> <y> [metadata]` | Required, declared once |
+| Hub | `hub: <name> <x> <y> [metadata]` | Unique name and unique coordinates |
+| End hub | `end_hub: <name> <x> <y> [metadata]` | Required, declared once |
+| Connection | `connection: <a>-<b> [max_link_capacity=<N>]` | Both hubs must exist; no duplicates, no self-loops |
+| Comment | `# ...` | Ignored, either as a full line or after a declaration |
+
+Zone names cannot contain spaces or `-`. The map must contain at least one connection.
+
+**Zone metadata** *(all optional, separated by spaces inside `[...]`)*:
+- `zone=<normal|priority|restricted|blocked>`: default `normal`
+- `max_drones=<N>`: default `1`. Start and end hubs always accept all drones (their capacity is set to `nb_drones`).
+- `color=<name>`: a single-word color name for the output. Unknown colors are printed in the default color.
 
 **Connection metadata** *(optional)*:
-- `max_link_capacity=<N>` — default: `1`
+- `max_link_capacity=<N>`: default `1`. Counts drones on the connection in **both** directions in the same turn.
+
+Any invalid line stops the program with a red `💥` error message that gives the line number.
 
 ---
 
@@ -161,7 +249,7 @@ Drones that do not move are omitted. Drones at goal are no longer tracked.
 
 ---
 
-## 🧠 Algorithm Choices and Implementation Strategy
+## 🧠 How It Works
 
 ### Pipeline
 
@@ -169,25 +257,35 @@ Drones that do not move are omitted. Drones at goal are no longer tracked.
 Input file → Parser → Graph → Dijkstra → Traffic → Simulator → Output
 ```
 
+| Module | Class | Responsibility |
+|---|---|---|
+| `parser.py` | `Parser` | Read the file from `sys.argv[1]`, validate it, and store zones, metadata, connections, and capacities |
+| `graph.py` | `Graph` | Build the adjacency list, movement costs, capacities, and colors |
+| `algorithm.py` | `Dijkstra` | Compute distances and list every shortest path |
+| `traffic.py` | `Traffic` | Assign paths to drones and plan every turn |
+| `simulator.py` | `Simulator` | Print the turns with colors |
+| `main.py` | `Main` | Connect the steps above in order |
+
 ---
 
 ### 1. Parser — `parser.py`
 
 Reads and validates the custom map format line by line using **regular expressions**. Extracts drone count, zone definitions with metadata, and connection declarations. Detects:
-- Duplicate zones and connections
-- Invalid formats and unknown keywords
-- Missing `start_hub`, `end_hub`, or `nb_drones`
+- Duplicate zones, coordinates, and connections
+- Invalid formats, unknown keywords, and unknown metadata keys
+- Missing `start_hub`, `end_hub`, or `nb_drones`, and repeated declarations of them
 - Invalid capacity values and zone types
+- Connections to unknown hubs and connections from a hub to itself
 
 ---
 
 ### 2. Graph — `graph.py`
 
 Transforms raw parser data into a queryable graph structure:
-- **Adjacency list** — bidirectional neighbor lookup per zone
-- **Edge weights** — movement cost based on the destination zone type
-- **Capacity storage** — zone and link capacities
-- **Zone colors** — metadata colors for visual output
+- **Adjacency list**: neighbors of each zone, in both directions
+- **Edge weights**: movement cost, set by the type of the **destination** zone
+- **Capacity storage**: zone and link capacities
+- **Zone colors**: metadata colors for visual output
 
 Blocked zones are removed from all neighbor lists during construction so pathfinding never routes through them.
 
@@ -195,15 +293,15 @@ Blocked zones are removed from all neighbor lists during construction so pathfin
 
 ### 3. Dijkstra + DFS — `algorithm.py`
 
-Finding optimal paths is done in two phases:
+Paths are found in two phases.
 
-**Phase 1 — Dijkstra distances**
+**Phase 1: Dijkstra distances**
 
-Computes the shortest cost from `start` to every zone using a standard greedy Dijkstra loop with a linear scan for the minimum (no priority queue — graph sizes are small enough).
+Computes the shortest cost from `start` to every zone with a standard greedy Dijkstra loop. The next zone is picked with a linear scan instead of a priority queue, because the maps are small.
 
 **Time complexity: O(V²)** where V = number of zones.
 
-**Phase 2 — DFS path enumeration**
+**Phase 2: DFS path enumeration**
 
 A depth-first search traverses only edges satisfying:
 
@@ -219,8 +317,7 @@ This guarantees every collected path is optimal. Produces **all** shortest paths
 
 ```
 T(V, P, L) = O(V²  +  P×L  +  P×L×log P)
-           = O(2809 +  60   +  95)          ← challenger map values
-           = O(V²)                           ← V² dominates
+           = O(V²)          ← V² dominates (the challenger map has V = 54 zones)
 ```
 
 Paths are sorted by a score function:
@@ -230,7 +327,7 @@ def _score(p) -> tuple[int, int]:
     return (-pri, len(p))   # more priority zones first, shorter paths first
 ```
 
-Drones are distributed across all found paths in **round-robin order**, maximizing throughput by spreading load across multiple routes.
+Drones are distributed across all found paths in **round-robin order**. This spreads the load over several routes and increases throughput.
 
 ---
 
@@ -238,16 +335,16 @@ Drones are distributed across all found paths in **round-robin order**, maximizi
 
 The simulation runs turn by turn. Each turn has two phases:
 
-**Phase 1 — Arrive transit drones**
+**Phase 1: Arrive transit drones**
 
 Drones that entered a restricted link last turn **must** arrive this turn. The subject states a drone cannot wait on a connection.
 
-**Phase 2 — Move available drones**
+**Phase 2: Move available drones**
 
 For each drone not in transit, check in order:
-1. **Link capacity** — reject if connection is full this turn
-2. **Zone type** — skip blocked zones
-3. **Zone capacity** — computed as:
+1. **Link capacity**: skip the move if the connection is full this turn (both directions count)
+2. **Zone type**: skip blocked zones
+3. **Zone capacity**: computed as:
 
 ```
 zone_used = zone_count[next]
@@ -255,13 +352,13 @@ zone_used = zone_count[next]
           + entering[next]        ← drones entering next_zone this turn
 ```
 
-This accounts for drones entering and leaving the **same zone in the same turn**, allowing maximum throughput.
+This counts drones that enter and leave the **same zone in the same turn**, so a zone can be refilled as soon as it empties.
 
-State updates are deferred until **after the full loop** so earlier drones do not block later ones in the same turn.
+State updates are applied **after the full loop**, so drones checked earlier in a turn do not block drones checked later.
 
-**Restricted zone handling**: drone enters link (turn 1, output: `D<id>-<from>-<to>`), arrives next turn (turn 2, output: `D<id>-<zone>`). Zone capacity for restricted destinations is checked at turn 1 using `entering_next_zone` to prevent overbooking.
+**Restricted zone handling**: the drone enters the link on turn 1 (output `D<id>-<from>-<to>`) and arrives on turn 2 (output `D<id>-<zone>`). Zone capacity for a restricted destination is checked on turn 1 with `entering_next_zone`, so the zone cannot be overbooked.
 
-A **deadlock** is detected when `plan_turn()` returns an empty list while not all drones have reached the goal.
+**Termination**: the simulation stops when every drone has reached the end hub. As a safety limit, it runs at most `nb_drones × 10` turns, so a blocked situation cannot loop forever. Turns with no moves are not printed. If no path exists between the start and end hubs, the program stops with a `Path not found` error.
 
 ---
 
@@ -269,7 +366,7 @@ A **deadlock** is detected when `plan_turn()` returns an empty list while not al
 
 ### Terminal Output
 
-Colorized using **ANSI escape codes**. Each zone name is rendered in the color declared in the map file. Turn labels use **Rich** (bold, italic, underline). A styled header panel displays the project name.
+Colored with **ANSI escape codes**. Each zone name is printed in the color declared in the map file (about 40 named colors are supported, such as `red`, `orange`, `gold`, `teal`, and `violet`). Turn labels use **Rich** (bold, italic, underline). A styled header panel displays the project name.
 
 ```
 ╭────────────────────────────────╮
@@ -279,15 +376,23 @@ Colorized using **ANSI escape codes**. Each zone name is rendered in the color d
 D1-start | D2-start | D3-start | D4-start
 
 - TURN: 1
-D1-start-junction | D2-start-junction
-
-- TURN: 2
 D1-junction | D2-junction
 
-Total turns: 7
+- TURN: 2
+D1-path_a | D2-path_b | D3-junction | D4-junction
+
+- TURN: 3
+D1-goal | D2-goal | D3-path_a | D4-path_b
+
+- TURN: 4
+D3-goal | D4-goal
+
+Total turns: 4
 ```
 
-Restricted transit moves are shown as `D<id>-<from>-<to>` on turn 1 and `D<id>-<zone>` on arrival — making the 2-turn movement visually explicit.
+*(Actual output of `maps/easy/02_simple_fork.txt`, without colors.)*
+
+Restricted transit moves are shown as `D<id>-<from>-<to>` on turn 1 and `D<id>-<zone>` on arrival, so the 2-turn movement is visible in the output.
 
 ---
 
@@ -296,27 +401,28 @@ Restricted transit moves are shown as `D<id>-<from>-<to>` on turn 1 and `D<id>-<
 An interactive HTML visualizer is provided at [`dijkstra.html`](dijkstra.html), accessible via the badge at the top of this README.
 
 **Features:**
-- Step-by-step walkthrough of Dijkstra's algorithm on a sample graph
-- Live distance table updating after each step
-- Color-coded nodes: current (yellow), visited (green), updated (blue), path (red)
-- Prev / Next step buttons and a progress bar
+- Step-by-step run of Dijkstra's algorithm on a sample graph (start `S`, end `Z`)
+- Click a node to change its zone type (`normal`, `blocked`, `priority`, `restricted`). Drag nodes to move them.
+- Live distance table (`dist`, `prev`, `done`) updated after each step
+- Color-coded nodes: current, updated, neighbor, and shortest path
+- **Run Dijkstra**, **Prev step** / **Next step**, **Reset map**, **Clear path** buttons, and a progress bar
 
 ---
 
-### Pygame Graphical Interface — `visualizer.py`
+### Pygame Graphical Interface — `viz.py`
 
-A full graphical interface built with **Pygame** showing the routing network and animating drone movements in real time.
+A full graphical interface built with **Pygame** (1440×880 window) that shows the routing network and animates drone movements in real time.
 
 **Features:**
 - Zones drawn as colored circles using metadata colors
 - Connections drawn as lines with capacity labels
-- Drones shown as small labeled circles that animate smoothly between zones
+- Drones shown as small labeled circles that move smoothly between zones
 - Drones on restricted links appear **mid-edge** between the two zone nodes
-- Multiple drones at the same zone spread in a circle to remain visible
+- Several drones in the same zone are spread in a circle so each stays visible
 - Live side panel: current turn, drone positions, this turn's moves
 - Speed control buttons: ×0.25 to ×8
 - Hover tooltip: zone type, color, capacity, cost, and drones present
-- **Live zone editor**: press `E` on any hovered zone to change its type, color, or capacity — simulation reruns instantly
+- **Live zone editor**: press `E` while hovering a zone to change its type, color, or capacity. The simulation reruns immediately.
 
 **Controls:**
 
@@ -333,17 +439,59 @@ A full graphical interface built with **Pygame** showing the routing network and
 
 ---
 
+## 🧪 Testing and Code Quality
+
+The project has no automated test suite. Code quality is checked with linting and type checking:
+
+```bash
+make lint
+```
+
+This runs `flake8 .` and `mypy .` with `--warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs`.
+
+To check behavior, run the simulation on the provided maps, from easy to challenger:
+
+```bash
+tar -xzf maps.tar.gz    # if not already extracted
+for map in maps/*/*.txt; do
+    echo "== $map"
+    uv run main.py "$map" | tail -n 1
+done
+```
+
+See `maps/README.md` (inside the archive) for what each map tests: dead ends, loops, capacity limits, and zone types.
+
+---
+
 ## 📊 Performance Results
+
+Turn counts printed by `main.py` (`Total turns`) for each provided map:
 
 | Difficulty | Map | Drones | Turns |
 |---|---|---|---|
-| Easy | Linear path | 2 | ≤ 6 |
-| Easy | Simple fork | 4 | ≤ 8 |
-| Medium | Dead end trap | 5 | ≤ 12 |
-| Hard | Maze nightmare | 8 | ≤ 30 |
-| **Challenger** | **The Impossible Dream** | **25** | **43** ✅ |
+| Easy | `01_linear_path` | 2 | 4 |
+| Easy | `02_simple_fork` | 4 | 4 |
+| Easy | `03_basic_capacity` | 4 | 4 |
+| Medium | `01_dead_end_trap` | 5 | 8 |
+| Medium | `02_circular_loop` | 6 | 15 |
+| Medium | `03_priority_puzzle` | 5 | 8 |
+| Hard | `01_maze_nightmare` | 8 | 13 |
+| Hard | `02_capacity_hell` | 12 | 16 |
+| Hard | `03_ultimate_challenge` | 15 | 26 |
+| **Challenger** | **`01_the_impossible_dream`** | **25** | **43** ✅ |
 
-> The challenger map target is ≤ 45 turns. Our algorithm achieves **43 turns**.
+> The challenger map target is ≤ 45 turns (the reference record in `maps/README.md`). Our algorithm achieves **43 turns**.
+
+---
+
+## 🔭 Possible Improvements
+
+Ideas based on the current implementation (not implemented):
+
+- Use a heap-based priority queue (`heapq`) in Dijkstra for larger maps.
+- Consider near-optimal paths too, not only the strictly shortest ones, to add capacity on congested maps.
+- Add `pygame` to `pyproject.toml` (for example as an optional dependency) so `make install` sets up the visualizer.
+- Add a `pytest` suite for the parser and simulation rules.
 
 ---
 
